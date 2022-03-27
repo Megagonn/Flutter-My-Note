@@ -2,7 +2,7 @@ class Note {
   final int? id;
   final String content;
   final String category;
-  final DateTime date;
+  final String date;
 
   Note({
     this.id,
@@ -15,7 +15,7 @@ class Note {
     return {
       'content': note.content,
       'category': note.category,
-      'date': note.date.toString(),
+      'date': note.date,
     };
   }
 
