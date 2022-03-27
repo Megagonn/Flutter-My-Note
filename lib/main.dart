@@ -1,6 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
+  if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+    databaseFactory = databaseFactoryFfi;
+  }
   runApp(const MyApp());
 }
 
