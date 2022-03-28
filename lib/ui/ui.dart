@@ -57,9 +57,11 @@ class _UIState extends State<UI> {
                 if (snapshot.data != null) {
                   return AnimationLimiter(
                     // ignore: sized_box_for_whitespace
-                    child: Column(
-                      children: [
-                        ListView.builder(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: Container(
+                        height: MediaQuery.of(context).size.height - 150,
+                        child: ListView.builder(
                           shrinkWrap: true,
                           itemCount: snapshot.data.length,
                           itemBuilder: (BuildContext context, int index) {
@@ -158,8 +160,11 @@ class _UIState extends State<UI> {
                                         // borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: GestureDetector(
-                                        onTap: () {
-                                          var index = data.id;
+                                        onTap: () async {
+                                          // List searchData =
+                                          //     await DbModel.db.getData();
+
+                                          // var index = data.id;
                                           TextEditingController
                                               textEditingController =
                                               TextEditingController();
@@ -173,43 +178,32 @@ class _UIState extends State<UI> {
                                                     floatingActionButton:
                                                         FloatingActionButton(
                                                       onPressed: () async {
-                                                        var getData =
-                                                            await DbModel.db
-                                                                .getData();
-                                                        // print(getData);
+                                                        
                                                         if (textEditingController
                                                                 .text !=
                                                             '') {
-                                                         await DbModel.db.updateDb(Note(
-                                                              content:
-                                                                  textEditingController
-                                                                      .text,
-                                                              category: cat,
-                                                              date: dateFormat.format(DateTime.now()),),index!);
-                                                          // var db = await DbModel
-                                                          //     .db.database;
-                                                          //   Note note = Note(
-                                                          //     content:
-                                                          //         textEditingController
-                                                          //             .text,
-                                                          //     category: cat,
-                                                          //     date: dateFormat
-                                                          //         .format(DateTime
-                                                          //             .now()),
-                                                          //   );
-                                                          //   await DbModel.db
-                                                          //       .addData(note);
-                                                          //   // addNote = note;
-                                                          //   setState(() {
-                                                          //     textEditingController
-                                                          //         .clear();
-                                                          //     Navigator.pushReplacement(
-                                                          //         context,
-                                                          //         MaterialPageRoute(
-                                                          //             builder:
-                                                          //                 (context) =>
-                                                          //                     UI()));
-                                                          //   });
+                                                        DbModel.db.updateDb(
+                                                            Note(
+                                                                content:
+                                                                    textEditingController
+                                                                        .text,
+                                                                category: data
+                                                                    .category,
+                                                                date: dateFormat
+                                                                    .format(DateTime
+                                                                        .now())),
+                                                            data.id!);
+                                                          
+                                                            setState(() {
+                                                              textEditingController
+                                                                  .clear();
+                                                              Navigator.pushReplacement(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                      builder:
+                                                                          (context) =>
+                                                                              UI()));
+                                                            });
                                                         }
                                                       },
                                                       child: Icon(
@@ -265,7 +259,7 @@ class _UIState extends State<UI> {
                             );
                           },
                         ),
-                      ],
+                      ),
                     ),
                   );
                 }
@@ -327,9 +321,7 @@ class _MyInputState extends State<MyInput> {
               DropdownButtonFormField(
                 onChanged: (val) {
                   setState(() {
-                    val.toString().isNotEmpty
-                        ? cat = val
-                        : cat = "Uncategorised";
+                    val == null ? cat = "Uncategorised" : cat = val;
                   });
                 },
                 decoration: InputDecoration(
@@ -349,7 +341,7 @@ class _MyInputState extends State<MyInput> {
                     child: Text("Coding"),
                     value: 'Coding',
                   ),
-                  DropdownMenuItem(child: Text('Others'), value: 'others'),
+                  DropdownMenuItem(child: Text('Others'), value: 'Others'),
                 ],
                 isExpanded: true,
               ),
