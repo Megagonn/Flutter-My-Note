@@ -25,6 +25,14 @@ class _UIState extends State<UI> {
     return datas;
   }
 
+  // String editText = '';
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // textEditingController.text = editText;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -56,6 +64,8 @@ class _UIState extends State<UI> {
                           itemCount: snapshot.data.length,
                           itemBuilder: (BuildContext context, int index) {
                             var data = Note.fromMap(snapshot.data[index]);
+                            // editText = data.content;
+                            // setState(() {});
                             // var formattedDate =
                             // dateFormat.format(DateTime.now());
                             // var date = formattedDate.toString();
@@ -135,17 +145,97 @@ class _UIState extends State<UI> {
                                         ),
                                         // borderRadius: BorderRadius.circular(10),
                                       ),
-                                      child: ListTile(
-                                        title: Text(data.content),
-                                        subtitle: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(data.category),
-                                            Text(data.date),
-                                          ],
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          TextEditingController
+                                              textEditingController =
+                                              TextEditingController();
+                                          // print(textEditingController.text);
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) {
+                                                return SafeArea(
+                                                  child: Scaffold(
+                                                    floatingActionButton:
+                                                        FloatingActionButton(
+                                                      onPressed: () async {
+                                                        var getData =
+                                                            await DbModel.db
+                                                                .getData();
+                                                          
+                                                        if (textEditingController
+                                                                .text !=
+                                                            '') {
+                                                          Note note = Note(
+                                                            content:
+                                                                textEditingController
+                                                                    .text,
+                                                            category: cat,
+                                                            date: dateFormat
+                                                                .format(DateTime
+                                                                    .now()),
+                                                          );
+                                                          await DbModel.db
+                                                              .addData(note);
+                                                          // addNote = note;
+                                                          setState(() {
+                                                            textEditingController
+                                                                .clear();
+                                                            Navigator.pushReplacement(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            UI()));
+                                                          });
+                                                        }
+                                                      },
+                                                      child: Icon(
+                                                        Icons.send_outlined,
+                                                      ),
+                                                    ),
+                                                    appBar: AppBar(),
+                                                    body: Container(
+                                                      height:
+                                                          MediaQuery.of(context)
+                                                              .size
+                                                              .height,
+                                                      child: Column(
+                                                        children: [
+                                                          TextField(
+                                                            maxLines: null,
+                                                            controller:
+                                                                textEditingController,
+                                                            decoration:
+                                                                InputDecoration(),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          );
+                                          setState(() {
+                                            // editText = data.content;
+                                            textEditingController.text =
+                                                data.content;
+                                          });
+                                        },
+                                        child: ListTile(
+                                          title: Text(data.content),
+                                          subtitle: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(data.category),
+                                              Text(data.date),
+                                            ],
+                                          ),
+                                          style: ListTileStyle.drawer,
                                         ),
-                                        style: ListTileStyle.drawer,
                                       ),
                                     ),
                                   ),
@@ -216,7 +306,7 @@ class _MyInputState extends State<MyInput> {
               DropdownButtonFormField(
                 onChanged: (val) {
                   setState(() {
-                    cat = val;
+                    cat = val ?? "Uncategorised";
                   });
                 },
                 decoration: InputDecoration(
@@ -226,7 +316,15 @@ class _MyInputState extends State<MyInput> {
                 items: [
                   DropdownMenuItem(
                     child: Text("Work"),
-                    value: 'work',
+                    value: 'Work',
+                  ),
+                  DropdownMenuItem(
+                    child: Text('School'),
+                    value: 'School',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("Coding"),
+                    value: 'Coding',
                   ),
                   DropdownMenuItem(child: Text('Others'), value: 'others'),
                 ],
