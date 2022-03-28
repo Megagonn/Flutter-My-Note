@@ -32,7 +32,12 @@ class _UIState extends State<UI> {
       home: SafeArea(
         child: Scaffold(
           // bottomNavigationBar: ,
-          floatingActionButton: FloatingActionButton(onPressed: (){}),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/inp');
+            },
+            child: Icon(Icons.add),
+          ),
           appBar: AppBar(
             title: const Text("Note Pad"),
           ),
@@ -118,8 +123,17 @@ class _UIState extends State<UI> {
                                     ],
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        border: Border(left: BorderSide(color: data.category.toLowerCase()=="work" ? Colors.green: Colors.purpleAccent, width: 4,),),
-                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border(
+                                          left: BorderSide(
+                                            color:
+                                                data.category.toLowerCase() ==
+                                                        "work"
+                                                    ? Colors.green
+                                                    : Colors.purpleAccent,
+                                            width: 4,
+                                          ),
+                                        ),
+                                        // borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: ListTile(
                                         title: Text(data.content),
@@ -177,15 +191,16 @@ class _UIState extends State<UI> {
 
 var cat;
 var cont;
+var addNote;
 
-class Input extends StatefulWidget {
-  const Input({Key? key}) : super(key: key);
+class MyInput extends StatefulWidget {
+  const MyInput({Key? key}) : super(key: key);
 
   @override
-  _InputState createState() => _InputState();
+  _MyInputState createState() => _MyInputState();
 }
 
-class _InputState extends State<Input> {
+class _MyInputState extends State<MyInput> {
   TextEditingController textEditingController = TextEditingController();
   var dateFormat = DateFormat();
   @override
@@ -219,28 +234,36 @@ class _InputState extends State<Input> {
               ),
               TextField(
                 controller: textEditingController,
-                onEditingComplete: () async {
+                onChanged: (val) {
                   // cont = textEditingController.value;
-                  if (textEditingController.text != '') {
-                    Note note = Note(
-                      content: textEditingController.text,
-                      category: cat,
-                      date: dateFormat.format(DateTime.now()),
-                    );
-                    await DbModel.db.addData(note);
-                    setState(() {
-                      textEditingController.clear();
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => UI()));
-                    });
-                  }
                 },
                 decoration: InputDecoration(
-                  hintText: "Category",
+                  hintText: "Note...",
                 ),
                 maxLines: 10,
               ),
             ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            if (textEditingController.text != '') {
+              Note note = Note(
+                content: textEditingController.text,
+                category: cat,
+                date: dateFormat.format(DateTime.now()),
+              );
+              await DbModel.db.addData(note);
+              // addNote = note;
+              setState(() {
+                textEditingController.clear();
+                Navigator.pushReplacement(
+                    context, MaterialPageRoute(builder: (context) => UI()));
+              });
+            }
+          },
+          child: Icon(
+            Icons.send_outlined,
           ),
         ),
       ),

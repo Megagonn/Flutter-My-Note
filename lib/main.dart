@@ -34,6 +34,13 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: UI(),
+      routes: {
+        "/inp": (context) {
+          return MyInput();
+        }
+      },
+
+      // UI(),
     );
   }
 }
