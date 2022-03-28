@@ -31,10 +31,13 @@ class _UIState extends State<UI> {
       debugShowCheckedModeBanner: false,
       home: SafeArea(
         child: Scaffold(
+          // bottomNavigationBar: ,
+          floatingActionButton: FloatingActionButton(onPressed: (){}),
           appBar: AppBar(
             title: const Text("Note Pad"),
           ),
           body: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
             child: FutureBuilder(
               future: datas(),
               builder: (context, AsyncSnapshot<dynamic> snapshot) {
@@ -48,21 +51,26 @@ class _UIState extends State<UI> {
                           itemCount: snapshot.data.length,
                           itemBuilder: (BuildContext context, int index) {
                             var data = Note.fromMap(snapshot.data[index]);
-                            var formattedDate = dateFormat.format(DateTime.now());
-                            var date = formattedDate.toString();
+                            // var formattedDate =
+                            // dateFormat.format(DateTime.now());
+                            // var date = formattedDate.toString();
                             return AnimationConfiguration.staggeredList(
                               position: index,
                               duration: const Duration(milliseconds: 375),
                               child: SlideAnimation(
+                                duration: Duration(seconds: 1),
+                                curve: Curves.bounceInOut,
                                 verticalOffset: 50.0,
                                 child: FadeInAnimation(
+                                  duration: Duration(seconds: 1),
+                                  curve: Curves.bounceInOut,
                                   child: SwipeActionCell(
                                     key: ValueKey(allData[index]),
                                     trailingActions: [
                                       SwipeAction(
                                           nestedAction: SwipeNestedAction(
                                             ///customize your nested action content
-                    
+
                                             content: Container(
                                               decoration: BoxDecoration(
                                                 borderRadius:
@@ -91,10 +99,10 @@ class _UIState extends State<UI> {
                                               ),
                                             ),
                                           ),
-                    
+
                                           ///you should set the default  bg color to transparent
                                           color: Colors.transparent,
-                    
+
                                           ///set content instead of title of icon
                                           content: _getIconButton(
                                               Colors.red, Icons.delete),
@@ -108,15 +116,23 @@ class _UIState extends State<UI> {
                                           color: Colors.transparent,
                                           onTap: (handler) {}),
                                     ],
-                                    child: ListTile(
-                                      title: Text(data.content),
-                                      subtitle: Row(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border(left: BorderSide(color: data.category.toLowerCase()=="work" ? Colors.green: Colors.purpleAccent, width: 4,),),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: ListTile(
+                                        title: Text(data.content),
+                                        subtitle: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(data.category),
-                                            Text(date),
-                                          ]),
+                                            Text(data.date),
+                                          ],
+                                        ),
+                                        style: ListTileStyle.drawer,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -140,61 +156,6 @@ class _UIState extends State<UI> {
       ),
     );
   }
-
-// Widget _item(int index) {
-//     return SwipeActionCell(
-//       key: ValueKey(allData[index]),
-//       trailingActions: [
-//         SwipeAction(
-//             nestedAction: SwipeNestedAction(
-//               ///customize your nested action content
-
-//               content: Container(
-//                 decoration: BoxDecoration(
-//                   borderRadius: BorderRadius.circular(30),
-//                   color: Colors.red,
-//                 ),
-//                 width: 130,
-//                 height: 60,
-//                 child: OverflowBox(
-//                   maxWidth: double.infinity,
-//                   child: Row(
-//                     mainAxisAlignment: MainAxisAlignment.center,
-//                     children: [
-//                       Icon(
-//                         Icons.delete,
-//                         color: Colors.white,
-//                       ),
-//                       Text('确认删除',
-//                           style: TextStyle(color: Colors.white, fontSize: 20)),
-//                     ],
-//                   ),
-//                 ),
-//               ),
-//             ),
-
-//             ///you should set the default  bg color to transparent
-//             color: Colors.transparent,
-
-//             ///set content instead of title of icon
-//             content: _getIconButton(Colors.red, Icons.delete),
-//             onTap: (handler) async {
-//               allData.removeAt(index);
-//               setState(() {});
-//             }),
-//         SwipeAction(
-//             content: _getIconButton(Colors.grey, Icons.vertical_align_top),
-//             color: Colors.transparent,
-//             onTap: (handler) {}),
-//       ],
-//       child: Padding(
-//         padding: const EdgeInsets.all(15.0),
-//         child: Text(
-//             "This is index of ${list[index]},Awesome Swipe Action Cell!! I like it very much!",
-//             style: TextStyle(fontSize: 25)),
-//       ),
-//     );
-//   }
 
   Widget _getIconButton(color, icon) {
     return Container(
@@ -226,13 +187,14 @@ class Input extends StatefulWidget {
 
 class _InputState extends State<Input> {
   TextEditingController textEditingController = TextEditingController();
+  var dateFormat = DateFormat();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         body: Container(
           padding: EdgeInsets.all(20),
-          height: double.infinity/2,
+          height: double.infinity / 2,
           child: Column(
             children: [
               // ignore: prefer_const_literals_to_create_immutables
@@ -242,17 +204,16 @@ class _InputState extends State<Input> {
                     cat = val;
                   });
                 },
+                decoration: InputDecoration(
+                  hintText: "Category",
+                ),
                 // ignore: prefer_const_literals_to_create_immutables
                 items: [
                   DropdownMenuItem(
                     child: Text("Work"),
                     value: 'work',
                   ),
-                  DropdownMenuItem(
-                    child: Text('Others'),
-                    value: 'others'
-                  ),
-                  
+                  DropdownMenuItem(child: Text('Others'), value: 'others'),
                 ],
                 isExpanded: true,
               ),
@@ -260,20 +221,25 @@ class _InputState extends State<Input> {
                 controller: textEditingController,
                 onEditingComplete: () async {
                   // cont = textEditingController.value;
-                  Note note = Note(
-                    content: textEditingController.text,
-                    category: cat,
-                    date: DateTime.now().toString(),
-                  );
-                  await DbModel.db.addData(note);
-                  setState(() {
-                    textEditingController.clear();
-                    Navigator.pushReplacement(
-                        context, MaterialPageRoute(builder: (context) => UI()));
-                  });
+                  if (textEditingController.text != '') {
+                    Note note = Note(
+                      content: textEditingController.text,
+                      category: cat,
+                      date: dateFormat.format(DateTime.now()),
+                    );
+                    await DbModel.db.addData(note);
+                    setState(() {
+                      textEditingController.clear();
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => UI()));
+                    });
+                  }
                 },
+                decoration: InputDecoration(
+                  hintText: "Category",
+                ),
+                maxLines: 10,
               ),
-              
             ],
           ),
         ),
