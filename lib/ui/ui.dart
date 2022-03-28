@@ -135,11 +135,23 @@ class _UIState extends State<UI> {
                                       decoration: BoxDecoration(
                                         border: Border(
                                           left: BorderSide(
-                                            color:
-                                                data.category.toLowerCase() ==
-                                                        "work"
-                                                    ? Colors.green
-                                                    : Colors.purpleAccent,
+                                            color: data.category
+                                                        .toLowerCase() ==
+                                                    "work"
+                                                ? Colors.greenAccent
+                                                : data.category.toLowerCase() ==
+                                                        "school"
+                                                    ? Colors.blueAccent
+                                                    : data.category
+                                                                .toLowerCase() ==
+                                                            "uncategorised"
+                                                        ? Colors.redAccent
+                                                        : data.category
+                                                                    .toLowerCase() ==
+                                                                "coding"
+                                                            ? Colors.tealAccent
+                                                            : Colors
+                                                                .purpleAccent,
                                             width: 4,
                                           ),
                                         ),
@@ -147,6 +159,7 @@ class _UIState extends State<UI> {
                                       ),
                                       child: GestureDetector(
                                         onTap: () {
+                                          var index = data.id;
                                           TextEditingController
                                               textEditingController =
                                               TextEditingController();
@@ -163,32 +176,40 @@ class _UIState extends State<UI> {
                                                         var getData =
                                                             await DbModel.db
                                                                 .getData();
-                                                          
+                                                        // print(getData);
                                                         if (textEditingController
                                                                 .text !=
                                                             '') {
-                                                          Note note = Note(
-                                                            content:
-                                                                textEditingController
-                                                                    .text,
-                                                            category: cat,
-                                                            date: dateFormat
-                                                                .format(DateTime
-                                                                    .now()),
-                                                          );
-                                                          await DbModel.db
-                                                              .addData(note);
-                                                          // addNote = note;
-                                                          setState(() {
-                                                            textEditingController
-                                                                .clear();
-                                                            Navigator.pushReplacement(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                    builder:
-                                                                        (context) =>
-                                                                            UI()));
-                                                          });
+                                                         await DbModel.db.updateDb(Note(
+                                                              content:
+                                                                  textEditingController
+                                                                      .text,
+                                                              category: cat,
+                                                              date: dateFormat.format(DateTime.now()),),index!);
+                                                          // var db = await DbModel
+                                                          //     .db.database;
+                                                          //   Note note = Note(
+                                                          //     content:
+                                                          //         textEditingController
+                                                          //             .text,
+                                                          //     category: cat,
+                                                          //     date: dateFormat
+                                                          //         .format(DateTime
+                                                          //             .now()),
+                                                          //   );
+                                                          //   await DbModel.db
+                                                          //       .addData(note);
+                                                          //   // addNote = note;
+                                                          //   setState(() {
+                                                          //     textEditingController
+                                                          //         .clear();
+                                                          //     Navigator.pushReplacement(
+                                                          //         context,
+                                                          //         MaterialPageRoute(
+                                                          //             builder:
+                                                          //                 (context) =>
+                                                          //                     UI()));
+                                                          //   });
                                                         }
                                                       },
                                                       child: Icon(
@@ -306,7 +327,9 @@ class _MyInputState extends State<MyInput> {
               DropdownButtonFormField(
                 onChanged: (val) {
                   setState(() {
-                    cat = val ?? "Uncategorised";
+                    val.toString().isNotEmpty
+                        ? cat = val
+                        : cat = "Uncategorised";
                   });
                 },
                 decoration: InputDecoration(

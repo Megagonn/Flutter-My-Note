@@ -48,11 +48,13 @@ class DbModel {
     );
   }
 
-  updateDb(Note note) async {
+  updateDb(Note note, int id) async {
     var db = await database;
     await db.update(
       "note",
       note.toMap(note),
+      where: 'id=?',
+      whereArgs: [id],
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
