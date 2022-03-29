@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:notepad2/model/notemodel.dart';
+import 'package:notepad2/ui/utilities.dart';
 import '../database/dbmodel.dart';
 import 'package:intl/intl.dart';
 
@@ -18,23 +19,11 @@ class UI extends StatefulWidget {
 
 class _UIState extends State<UI> {
   Key key = Key("ade");
-  var dateFormat = DateFormat();
-  var allData;
-  datas() async {
-    var datas = await DbModel.db.getData();
-    allData = datas;
-    return datas;
-  }
+
   var items = <BottomNavItem>[
-    BottomNavItem(
-        title: 'Home',
-        widget: Icon(Icons.home_outlined)),
-    BottomNavItem(
-        title: 'Add note',
-        widget: Icon(Icons.add)),
-    BottomNavItem(
-        title: 'Category',
-        widget: Icon(Icons.category_outlined)),
+    BottomNavItem(title: 'Home', widget: Icon(Icons.home_outlined)),
+    BottomNavItem(title: 'Add note', widget: Icon(Icons.add)),
+    BottomNavItem(title: 'Category', widget: Icon(Icons.category_outlined)),
   ];
 
   var cIndex;
@@ -46,6 +35,9 @@ class _UIState extends State<UI> {
     // textEditingController.text = editText;
   }
 
+  PageController pageController = PageController();
+  int currentIndex = 1;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -53,280 +45,56 @@ class _UIState extends State<UI> {
       home: SafeArea(
         child: Scaffold(
           bottomNavigationBar: BottomAnimation(
-            
-          selectedIndex: cIndex,
-          items: items,
-          backgroundColor: Color(0xffea8c55),
-          onItemSelect: (value) {
-            setState(() {
-              cIndex = value;
-            });
-          },
-          itemHoverColor: Color(0xfff5dd90),
-          itemHoverColorOpacity: .5,
-          activeIconColor: Colors.black,
-          deActiveIconColor: Colors.black38,
-          barRadius: 30,
-          textStyle: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
-          itemHoverWidth: 135,
-          itemHoverBorderRadius: 30,
-        ),
-     
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/inp');
+            selectedIndex: cIndex,
+            items: items,
+            backgroundColor: Color(0xffea8c55),
+            onItemSelect: (value) {
+              setState(() {
+                cIndex = value;
+                pager(value);
+              });
             },
-            child: Icon(Icons.add),
+            itemHoverColor: Color(0xfff5dd90),
+            itemHoverColorOpacity: .5,
+            activeIconColor: Colors.black,
+            deActiveIconColor: Colors.black38,
+            barRadius: 30,
+            textStyle: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+            itemHoverWidth: 135,
+            itemHoverBorderRadius: 30,
           ),
+          // floatingActionButton: FloatingActionButton(
+          //   onPressed: () {
+          //     Navigator.pushNamed(context, '/inp');
+          //   },
+          //   child: Icon(Icons.add),
+          // ),
           appBar: AppBar(
             title: const Text("Note Pad"),
           ),
-          body: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: FutureBuilder(
-              future: datas(),
-              builder: (context, AsyncSnapshot<dynamic> snapshot) {
-                if (snapshot.data != null) {
-                  return AnimationLimiter(
-                    // ignore: sized_box_for_whitespace
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: Container(
-                        height: MediaQuery.of(context).size.height - 150,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: snapshot.data.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            var data = Note.fromMap(snapshot.data[index]);
-                            // editText = data.content;
-                            // setState(() {});
-                            // var formattedDate =
-                            // dateFormat.format(DateTime.now());
-                            // var date = formattedDate.toString();
-                            return AnimationConfiguration.staggeredList(
-                              position: index,
-                              duration: const Duration(milliseconds: 375),
-                              child: SlideAnimation(
-                                duration: Duration(seconds: 1),
-                                curve: Curves.bounceInOut,
-                                verticalOffset: 50.0,
-                                child: FadeInAnimation(
-                                  duration: Duration(seconds: 1),
-                                  curve: Curves.bounceIn,
-                                  child: SwipeActionCell(
-                                    key: ValueKey(allData[index]),
-                                    trailingActions: [
-                                      SwipeAction(
-                                          nestedAction: SwipeNestedAction(
-                                            ///customize your nested action content
-
-                                            content: Container(
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(30),
-                                                color: Colors.red,
-                                              ),
-                                              width: 130,
-                                              height: 60,
-                                              child: OverflowBox(
-                                                maxWidth: double.infinity,
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  // ignore: prefer_const_literals_to_create_immutables
-                                                  children: [
-                                                    const Icon(
-                                                      Icons.delete,
-                                                      color: Colors.white,
-                                                    ),
-                                                    const Text('Del',
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 20)),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-
-                                          ///you should set the default  bg color to transparent
-                                          color: Colors.tealAccent,
-
-                                          ///set content instead of title of icon
-                                          content: _getIconButton(
-                                              Colors.red, Icons.delete),
-                                          onTap: (handler) async {
-                                            await handler(true);
-                                            DbModel.db.delData(data.id!);
-                                            setState(() {});
-                                          }),
-                                      SwipeAction(
-                                          content: _getIconButton(Colors.grey,
-                                              Icons.vertical_align_top),
-                                          color: Colors.transparent,
-                                          onTap: (handler) {}),
-                                    ],
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        border: Border(
-                                          left: BorderSide(
-                                            color: data.category
-                                                        .toLowerCase() ==
-                                                    "work"
-                                                ? Colors.greenAccent
-                                                : data.category.toLowerCase() ==
-                                                        "school"
-                                                    ? Colors.blueAccent
-                                                    : data.category
-                                                                .toLowerCase() ==
-                                                            "uncategorised"
-                                                        ? Colors.redAccent
-                                                        : data.category
-                                                                    .toLowerCase() ==
-                                                                "coding"
-                                                            ? Colors.tealAccent
-                                                            : Colors
-                                                                .purpleAccent,
-                                            width: 4,
-                                          ),
-                                        ),
-                                        // borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          // List searchData =
-                                          //     await DbModel.db.getData();
-
-                                          // var index = data.id;
-                                          TextEditingController
-                                              textEditingController =
-                                              TextEditingController();
-                                          // print(textEditingController.text);
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) {
-                                                return SafeArea(
-                                                  child: Scaffold(
-                                                    floatingActionButton:
-                                                        FloatingActionButton(
-                                                      onPressed: () async {
-                                                        if (textEditingController
-                                                                .text !=
-                                                            '') {
-                                                          DbModel.db.updateDb(
-                                                              Note(
-                                                                  content:
-                                                                      textEditingController
-                                                                          .text,
-                                                                  category: data
-                                                                      .category,
-                                                                  date: dateFormat
-                                                                      .format(DateTime
-                                                                          .now())),
-                                                              data.id!);
-
-                                                          setState(() {
-                                                            textEditingController
-                                                                .clear();
-                                                            Navigator.pushReplacement(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                    builder:
-                                                                        (context) =>
-                                                                            UI()));
-                                                          });
-                                                        }
-                                                      },
-                                                      child: Icon(
-                                                        Icons.send_outlined,
-                                                      ),
-                                                    ),
-                                                    appBar: AppBar(),
-                                                    body: Container(
-                                                      height:
-                                                          MediaQuery.of(context)
-                                                              .size
-                                                              .height,
-                                                      child: Column(
-                                                        children: [
-                                                          TextField(
-                                                            maxLines: null,
-                                                            controller:
-                                                                textEditingController,
-                                                            decoration:
-                                                                InputDecoration(),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          );
-                                          setState(() {
-                                            // editText = data.content;
-                                            textEditingController.text =
-                                                data.content;
-                                          });
-                                        },
-                                        child: ListTile(
-                                          title: Text(data.content),
-                                          subtitle: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(data.category),
-                                              Text(data.date),
-                                            ],
-                                          ),
-                                          style: ListTileStyle.drawer,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  );
-                }
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: LinearProgressIndicator());
-                } else {
-                  return const Center(child: Text("No note"));
-                }
-              },
-            ),
+          body: PageView(
+            controller: pageController,
+            onPageChanged: (val) {
+              setState(() {
+                currentIndex = val;
+                pageController.jumpToPage(val);
+              });
+            },
+            children: [Home(), MyInput(), Category()],
           ),
         ),
       ),
     );
   }
-
-  Widget _getIconButton(color, icon) {
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(25),
-
-        ///set you real bg color in your content
-        color: color,
-      ),
-      child: Icon(
-        icon,
-        color: Colors.white,
-      ),
-    );
+  void pager(index) {
+    setState(() {
+      currentIndex = index;
+      pageController.jumpToPage(index);
+    });
   }
 }
 
