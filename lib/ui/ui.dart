@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:bottom_animation/bottom_animation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -24,12 +25,24 @@ class _UIState extends State<UI> {
     allData = datas;
     return datas;
   }
+  var items = <BottomNavItem>[
+    BottomNavItem(
+        title: 'Home',
+        widget: Icon(Icons.home_outlined)),
+    BottomNavItem(
+        title: 'Add note',
+        widget: Icon(Icons.add)),
+    BottomNavItem(
+        title: 'Category',
+        widget: Icon(Icons.category_outlined)),
+  ];
 
-  // String editText = '';
+  var cIndex;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    cIndex = 0;
     // textEditingController.text = editText;
   }
 
@@ -39,7 +52,30 @@ class _UIState extends State<UI> {
       debugShowCheckedModeBanner: false,
       home: SafeArea(
         child: Scaffold(
-          // bottomNavigationBar: ,
+          bottomNavigationBar: BottomAnimation(
+            
+          selectedIndex: cIndex,
+          items: items,
+          backgroundColor: Color(0xffea8c55),
+          onItemSelect: (value) {
+            setState(() {
+              cIndex = value;
+            });
+          },
+          itemHoverColor: Color(0xfff5dd90),
+          itemHoverColorOpacity: .5,
+          activeIconColor: Colors.black,
+          deActiveIconColor: Colors.black38,
+          barRadius: 30,
+          textStyle: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+          itemHoverWidth: 135,
+          itemHoverBorderRadius: 30,
+        ),
+     
           floatingActionButton: FloatingActionButton(
             onPressed: () {
               Navigator.pushNamed(context, '/inp');
@@ -80,7 +116,7 @@ class _UIState extends State<UI> {
                                 verticalOffset: 50.0,
                                 child: FadeInAnimation(
                                   duration: Duration(seconds: 1),
-                                  curve: Curves.bounceInOut,
+                                  curve: Curves.bounceIn,
                                   child: SwipeActionCell(
                                     key: ValueKey(allData[index]),
                                     trailingActions: [
@@ -118,13 +154,14 @@ class _UIState extends State<UI> {
                                           ),
 
                                           ///you should set the default  bg color to transparent
-                                          color: Colors.transparent,
+                                          color: Colors.tealAccent,
 
                                           ///set content instead of title of icon
                                           content: _getIconButton(
                                               Colors.red, Icons.delete),
                                           onTap: (handler) async {
-                                            allData.removeAt(index);
+                                            await handler(true);
+                                            DbModel.db.delData(data.id!);
                                             setState(() {});
                                           }),
                                       SwipeAction(
@@ -178,32 +215,31 @@ class _UIState extends State<UI> {
                                                     floatingActionButton:
                                                         FloatingActionButton(
                                                       onPressed: () async {
-                                                        
                                                         if (textEditingController
                                                                 .text !=
                                                             '') {
-                                                        DbModel.db.updateDb(
-                                                            Note(
-                                                                content:
-                                                                    textEditingController
-                                                                        .text,
-                                                                category: data
-                                                                    .category,
-                                                                date: dateFormat
-                                                                    .format(DateTime
-                                                                        .now())),
-                                                            data.id!);
-                                                          
-                                                            setState(() {
-                                                              textEditingController
-                                                                  .clear();
-                                                              Navigator.pushReplacement(
-                                                                  context,
-                                                                  MaterialPageRoute(
-                                                                      builder:
-                                                                          (context) =>
-                                                                              UI()));
-                                                            });
+                                                          DbModel.db.updateDb(
+                                                              Note(
+                                                                  content:
+                                                                      textEditingController
+                                                                          .text,
+                                                                  category: data
+                                                                      .category,
+                                                                  date: dateFormat
+                                                                      .format(DateTime
+                                                                          .now())),
+                                                              data.id!);
+
+                                                          setState(() {
+                                                            textEditingController
+                                                                .clear();
+                                                            Navigator.pushReplacement(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            UI()));
+                                                          });
                                                         }
                                                       },
                                                       child: Icon(
