@@ -14,16 +14,18 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-var data;
+// var data;
 var dateFormat = DateFormat();
+var editData;
+
+var allData;
 
 class _HomeState extends State<Home> {
   TextEditingController textEditingController = TextEditingController();
-  var allData;
-  datas() async {
-    var datas = await DbModel.db.getData();
-    allData = datas;
-    return datas;
+  data() async {
+    var datase = await DbModel.db.getData();
+    allData = datase;
+    return datase;
   }
 
   @override
@@ -33,7 +35,7 @@ class _HomeState extends State<Home> {
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: FutureBuilder(
-            future: datas(),
+            future: data(),
             builder: (context, AsyncSnapshot<dynamic> snapshot) {
               if (snapshot.data != null) {
                 return AnimationLimiter(
@@ -46,9 +48,13 @@ class _HomeState extends State<Home> {
                         shrinkWrap: true,
                         itemCount: snapshot.data.length,
                         itemBuilder: (BuildContext context, int index) {
-                          data = Note.fromMap(snapshot.data[index]);
                           // editText = data.content;
-                          // setState(() {});
+                          var data = Note.fromMap(snapshot.data[index]);
+
+                          // print(editData);
+                          // setState(() {
+
+                          // });
                           // var formattedDate =
                           // dateFormat.format(DateTime.now());
                           // var date = formattedDate.toString();
@@ -99,7 +105,7 @@ class _HomeState extends State<Home> {
                                         ),
 
                                         ///you should set the default  bg color to transparent
-                                        color: Colors.tealAccent,
+                                        color: Colors.transparent,
 
                                         ///set content instead of title of icon
                                         content: _getIconButton(
@@ -109,11 +115,11 @@ class _HomeState extends State<Home> {
                                           DbModel.db.delData(data.id!);
                                           setState(() {});
                                         }),
-                                    SwipeAction(
-                                        content: _getIconButton(Colors.grey,
-                                            Icons.vertical_align_top),
-                                        color: Colors.transparent,
-                                        onTap: (handler) {}),
+                                    // SwipeAction(
+                                    //     content: _getIconButton(Colors.grey,
+                                    //         Icons.vertical_align_top),
+                                    //     color: Colors.transparent,
+                                    //     onTap: (handler) {}),
                                   ],
                                   child: Container(
                                     decoration: BoxDecoration(
@@ -139,40 +145,38 @@ class _HomeState extends State<Home> {
                                       ),
                                       // borderRadius: BorderRadius.circular(10),
                                     ),
-                                    child: GestureDetector(
-                                      onTap: () async {
-                                        // List searchData =
-                                        //     await DbModel.db.getData();
-
-                                        // var index = data.id;
-
-                                        // print(textEditingController.text);
-                                        Navigator.pushReplacement(
+                                    child: ListTile(
+                                      onTap: (() {
+                                        setState(() {
+                                          // editData = data.content.toString();
+                                          // print(data.id);
+                                          editData = {
+                                            'content': data.content,
+                                            'category': data.category,
+                                            'id': data.id,
+                                            'date': data.date,
+                                          };
+                                        });
+                                        Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) {
+                                              // editData = data.content;
                                               return Edit();
                                             },
                                           ),
                                         );
-                                        setState(() {
-                                          // editText = data.content;
-                                          textEditingController.text =
-                                              data.content;
-                                        });
-                                      },
-                                      child: ListTile(
-                                        title: Text(data.content),
-                                        subtitle: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(data.category),
-                                            Text(data.date),
-                                          ],
-                                        ),
-                                        style: ListTileStyle.drawer,
+                                      }),
+                                      title: Text(data.content),
+                                      subtitle: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(data.category),
+                                          Text(data.date),
+                                        ],
                                       ),
+                                      style: ListTileStyle.drawer,
                                     ),
                                   ),
                                 ),
@@ -224,6 +228,19 @@ class Edit extends StatefulWidget {
 
 class _EditState extends State<Edit> {
   TextEditingController textEditingController = TextEditingController();
+
+  @override
+  void initState() {
+    // ignore: todo
+    // TODO: implement initState
+    super.initState();
+    // print(editData);
+    // print(editData[0].content);
+    // print(editData[1]);
+    // print(allData);
+    textEditingController.text = editData['content'];
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -234,9 +251,9 @@ class _EditState extends State<Edit> {
               DbModel.db.updateDb(
                   Note(
                       content: textEditingController.text,
-                      category: data.category,
+                      category: editData['category'],
                       date: dateFormat.format(DateTime.now())),
-                  data.id!);
+                  editData['id']);
 
               setState(() {
                 textEditingController.clear();
@@ -257,7 +274,7 @@ class _EditState extends State<Edit> {
               TextField(
                 maxLines: null,
                 controller: textEditingController,
-                decoration: InputDecoration(),
+                // decoration: InputDecoration(),
               ),
             ],
           ),
@@ -268,7 +285,7 @@ class _EditState extends State<Edit> {
 }
 
 class Category extends StatelessWidget {
-  const Category({ Key? key }) : super(key: key);
+  const Category({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
