@@ -36,6 +36,7 @@ class _HomeState extends State<Home> {
           scrollDirection: Axis.vertical,
           child: FutureBuilder(
             future: data(),
+            //  isSearching() == false ? returnResult() :  ,
             builder: (context, AsyncSnapshot<dynamic> snapshot) {
               if (snapshot.data != null) {
                 return AnimationLimiter(
@@ -48,26 +49,17 @@ class _HomeState extends State<Home> {
                         shrinkWrap: true,
                         itemCount: snapshot.data.length,
                         itemBuilder: (BuildContext context, int index) {
-                          // editText = data.content;
                           var data = Note.fromMap(snapshot.data[index]);
-
-                          // print(editData);
-                          // setState(() {
-
-                          // });
-                          // var formattedDate =
-                          // dateFormat.format(DateTime.now());
-                          // var date = formattedDate.toString();
                           return AnimationConfiguration.staggeredList(
                             position: index,
                             duration: const Duration(milliseconds: 375),
                             child: SlideAnimation(
                               duration: Duration(seconds: 1),
-                              curve: Curves.bounceInOut,
+                              curve: Curves.easeInOutSine,
                               verticalOffset: 50.0,
                               child: FadeInAnimation(
                                 duration: Duration(seconds: 1),
-                                curve: Curves.bounceIn,
+                                curve: Curves.easeInOutSine,
                                 child: SwipeActionCell(
                                   key: ValueKey(allData[index]),
                                   trailingActions: [
@@ -219,6 +211,8 @@ class _HomeState extends State<Home> {
   }
 }
 
+
+
 class Edit extends StatefulWidget {
   const Edit({Key? key}) : super(key: key);
 
@@ -234,10 +228,6 @@ class _EditState extends State<Edit> {
     // ignore: todo
     // TODO: implement initState
     super.initState();
-    // print(editData);
-    // print(editData[0].content);
-    // print(editData[1]);
-    // print(allData);
     textEditingController.text = editData['content'];
   }
 
@@ -292,9 +282,6 @@ class Category extends StatelessWidget {
     // ignore: prefer_const_constructors
     return SafeArea(
       child: Scaffold(
-        // appBar: AppBar(
-        //   title: Text('Category')
-        // ),
         body: Container(
           child: Text('Categories...'),
         ),

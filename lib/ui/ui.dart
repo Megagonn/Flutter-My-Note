@@ -17,6 +17,15 @@ class UI extends StatefulWidget {
   _UIState createState() => _UIState();
 }
 
+///Search enabler
+var searchIt = true;
+bool isSearching() {
+  return !searchIt;
+}
+
+///search result
+var result;
+
 class _UIState extends State<UI> {
   Key key = Key("ade");
 
@@ -32,22 +41,29 @@ class _UIState extends State<UI> {
     // TODO: implement initState
     super.initState();
     cIndex = 0;
+    // searchIt = true;
     // textEditingController.text = editText;
   }
 
+  TextEditingController textEditingController = TextEditingController();
   PageController pageController = PageController();
   int currentIndex = 1;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        primaryColor: Color(0xffea8c55),
+        primaryColorLight: Color(0xfff5dd90),
+      ),
       debugShowCheckedModeBanner: false,
       home: SafeArea(
         child: Scaffold(
+          ///Bottom NavBar
           bottomNavigationBar: BottomAnimation(
             selectedIndex: cIndex,
             items: items,
-            backgroundColor: Color(0xffea8c55),
+            backgroundColor: Color.fromARGB(255, 247, 185, 185),
             onItemSelect: (value) {
               setState(() {
                 cIndex = value;
@@ -57,25 +73,57 @@ class _UIState extends State<UI> {
             itemHoverColor: Color(0xfff5dd90),
             itemHoverColorOpacity: .5,
             activeIconColor: Colors.black,
-            deActiveIconColor: Colors.black38,
+            deActiveIconColor: Color.fromARGB(255, 0, 0, 0),
             barRadius: 30,
             textStyle: TextStyle(
-              color: Colors.black,
+              color: Color.fromARGB(255, 124, 115, 115),
               fontWeight: FontWeight.bold,
               fontSize: 14,
             ),
             itemHoverWidth: 135,
             itemHoverBorderRadius: 30,
           ),
-          // floatingActionButton: FloatingActionButton(
-          //   onPressed: () {
-          //     Navigator.pushNamed(context, '/inp');
-          //   },
-          //   child: Icon(Icons.add),
-          // ),
+
+          ///AppBar
           appBar: AppBar(
             title: const Text("Note Pad"),
+
+            ///actions
+            actions: [
+              isSearching()
+                  ? SizedBox(
+                      width: 140,
+                      child: TextField(
+                        controller: textEditingController,
+                        onEditingComplete: () {
+                          setState(() {
+                            searchIt = true;
+                            isSearching();
+                            search(textEditingController.text);
+                            // result;
+                            returnResult();
+                          });
+                          textEditingController.clear();
+                        },
+                        decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Color(0xfff5dd90),
+                            hintText: 'search'),
+                      ),
+                    )
+                  : SizedBox(),
+              IconButton(
+                  onPressed: () {
+                    setState(() {
+                      searchIt = false;
+                      isSearching();
+                    });
+                  },
+                  icon: Icon(CupertinoIcons.search))
+            ],
           ),
+
+          ///Body
           body: PageView(
             controller: pageController,
             onPageChanged: (val) {
@@ -90,12 +138,27 @@ class _UIState extends State<UI> {
       ),
     );
   }
+
   void pager(index) {
     setState(() {
       currentIndex = index;
       pageController.jumpToPage(index);
     });
   }
+}
+
+search(val) async {
+  List datas = await DbModel.db.getData();
+  result = datas;
+  return val == null
+      ? datas
+      : datas
+          .retainWhere((element) => element.content.toString().contains(val));
+  // return datas;
+}
+
+returnResult() {
+  return result;
 }
 
 var cat;
@@ -157,7 +220,7 @@ class _MyInputState extends State<MyInput> {
                 decoration: InputDecoration(
                   hintText: "Note...",
                 ),
-                maxLines: 10,
+                maxLines: 15,
               ),
             ],
           ),
@@ -166,7 +229,7 @@ class _MyInputState extends State<MyInput> {
           onPressed: () async {
             if (textEditingController.text != '') {
               Note note = Note(
-                content: textEditingController.text,
+                content: textEditingController.text.trim(),
                 category: cat,
                 date: dateFormat.format(DateTime.now()),
               );
