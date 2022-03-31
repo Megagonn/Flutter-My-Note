@@ -9,6 +9,8 @@ import 'package:notepad2/model/notemodel.dart';
 import 'package:notepad2/ui/utilities.dart';
 import '../database/dbmodel.dart';
 import 'package:intl/intl.dart';
+import '../provider/provider.dart';
+import 'package:provider/provider.dart';
 
 class UI extends StatefulWidget {
   const UI({Key? key}) : super(key: key);
@@ -24,7 +26,7 @@ bool isSearching() {
 }
 
 ///search result
-var result;
+List result = [];
 
 class _UIState extends State<UI> {
   Key key = Key("ade");
@@ -36,6 +38,17 @@ class _UIState extends State<UI> {
   ];
 
   var cIndex;
+
+  search(val) async {
+    List datas = await DbModel.db.getData();
+    var prov = context.select((Prov myProv) => myProv);
+    var kist = datas.where((element) => element['content'].contains(val));
+    setState(() {
+      result.addAll(kist);
+    });
+    prov.changeData(result);
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -100,7 +113,6 @@ class _UIState extends State<UI> {
                             searchIt = true;
                             isSearching();
                             search(textEditingController.text);
-                            // result;
                             returnResult();
                           });
                           textEditingController.clear();
@@ -147,17 +159,8 @@ class _UIState extends State<UI> {
   }
 }
 
-search(val) async {
-  List datas = await DbModel.db.getData();
-  result = datas;
-  return val == null
-      ? datas
-      : datas
-          .retainWhere((element) => element.content.toString().contains(val));
-  // return datas;
-}
-
 returnResult() {
+  // print('this is result $result');
   return result;
 }
 

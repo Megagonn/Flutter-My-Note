@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_launcher_icons/utils.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
 import 'package:intl/intl.dart';
@@ -6,6 +7,8 @@ import 'package:intl/intl.dart';
 import '../database/dbmodel.dart';
 import '../model/notemodel.dart';
 import 'ui.dart';
+import '../provider/provider.dart';
+import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -34,160 +37,170 @@ class _HomeState extends State<Home> {
       child: Scaffold(
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
-          child: FutureBuilder(
-            future: data(),
-            //  isSearching() == false ? returnResult() :  ,
-            builder: (context, AsyncSnapshot<dynamic> snapshot) {
-              if (snapshot.data != null) {
-                return AnimationLimiter(
-                  // ignore: sized_box_for_whitespace
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: Container(
-                      height: MediaQuery.of(context).size.height - 150,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: snapshot.data.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          var data = Note.fromMap(snapshot.data[index]);
-                          return AnimationConfiguration.staggeredList(
-                            position: index,
-                            duration: const Duration(milliseconds: 375),
-                            child: SlideAnimation(
-                              duration: Duration(seconds: 1),
-                              curve: Curves.easeInOutSine,
-                              verticalOffset: 50.0,
-                              child: FadeInAnimation(
-                                duration: Duration(seconds: 1),
-                                curve: Curves.easeInOutSine,
-                                child: SwipeActionCell(
-                                  key: ValueKey(allData[index]),
-                                  trailingActions: [
-                                    SwipeAction(
-                                        nestedAction: SwipeNestedAction(
-                                          ///customize your nested action content
+          child: isSearching()
+              ? Search()
+              : FutureBuilder(
+                  future: data(),
+                  //  isSearching() == false ? returnResult() :  ,
+                  builder: (context, AsyncSnapshot<dynamic> snapshot) {
+                    if (snapshot.data != null) {
+                      return AnimationLimiter(
+                        // ignore: sized_box_for_whitespace
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: Container(
+                            height: MediaQuery.of(context).size.height - 150,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: snapshot.data.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                var data = Note.fromMap(snapshot.data[index]);
+                                return AnimationConfiguration.staggeredList(
+                                  position: index,
+                                  duration: const Duration(milliseconds: 375),
+                                  child: SlideAnimation(
+                                    duration: Duration(seconds: 1),
+                                    curve: Curves.easeInOutSine,
+                                    verticalOffset: 50.0,
+                                    child: FadeInAnimation(
+                                      duration: Duration(seconds: 1),
+                                      curve: Curves.easeInOutSine,
+                                      child: SwipeActionCell(
+                                        key: ValueKey(allData[index]),
+                                        trailingActions: [
+                                          SwipeAction(
+                                              nestedAction: SwipeNestedAction(
+                                                ///customize your nested action content
 
-                                          content: Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                              color: Colors.red,
-                                            ),
-                                            width: 130,
-                                            height: 60,
-                                            child: OverflowBox(
-                                              maxWidth: double.infinity,
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                // ignore: prefer_const_literals_to_create_immutables
-                                                children: [
-                                                  const Icon(
-                                                    Icons.delete,
-                                                    color: Colors.white,
+                                                content: Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            30),
+                                                    color: Colors.red,
                                                   ),
-                                                  const Text('Del',
-                                                      style: TextStyle(
+                                                  width: 130,
+                                                  height: 60,
+                                                  child: OverflowBox(
+                                                    maxWidth: double.infinity,
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      // ignore: prefer_const_literals_to_create_immutables
+                                                      children: [
+                                                        const Icon(
+                                                          Icons.delete,
                                                           color: Colors.white,
-                                                          fontSize: 20)),
-                                                ],
+                                                        ),
+                                                        const Text('Del',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 20)),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+
+                                              ///you should set the default  bg color to transparent
+                                              color: Colors.transparent,
+
+                                              ///set content instead of title of icon
+                                              content: _getIconButton(
+                                                  Colors.red, Icons.delete),
+                                              onTap: (handler) async {
+                                                await handler(true);
+                                                DbModel.db.delData(data.id!);
+                                                setState(() {});
+                                              }),
+                                          // SwipeAction(
+                                          //     content: _getIconButton(Colors.grey,
+                                          //         Icons.vertical_align_top),
+                                          //     color: Colors.transparent,
+                                          //     onTap: (handler) {}),
+                                        ],
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                              left: BorderSide(
+                                                color: data.category
+                                                            .toLowerCase() ==
+                                                        "work"
+                                                    ? Colors.greenAccent
+                                                    : data.category
+                                                                .toLowerCase() ==
+                                                            "school"
+                                                        ? Colors.blueAccent
+                                                        : data.category
+                                                                    .toLowerCase() ==
+                                                                "uncategorised"
+                                                            ? Colors.redAccent
+                                                            : data.category
+                                                                        .toLowerCase() ==
+                                                                    "coding"
+                                                                ? Colors
+                                                                    .tealAccent
+                                                                : Colors
+                                                                    .purpleAccent,
+                                                width: 4,
                                               ),
                                             ),
+                                            // borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: ListTile(
+                                            onTap: (() {
+                                              setState(() {
+                                                // editData = data.content.toString();
+                                                // print(data.id);
+                                                editData = {
+                                                  'content': data.content,
+                                                  'category': data.category,
+                                                  'id': data.id,
+                                                  'date': data.date,
+                                                };
+                                              });
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) {
+                                                    // editData = data.content;
+                                                    return Edit();
+                                                  },
+                                                ),
+                                              );
+                                            }),
+                                            title: Text(data.content),
+                                            subtitle: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(data.category),
+                                                Text(data.date),
+                                              ],
+                                            ),
+                                            style: ListTileStyle.drawer,
                                           ),
                                         ),
-
-                                        ///you should set the default  bg color to transparent
-                                        color: Colors.transparent,
-
-                                        ///set content instead of title of icon
-                                        content: _getIconButton(
-                                            Colors.red, Icons.delete),
-                                        onTap: (handler) async {
-                                          await handler(true);
-                                          DbModel.db.delData(data.id!);
-                                          setState(() {});
-                                        }),
-                                    // SwipeAction(
-                                    //     content: _getIconButton(Colors.grey,
-                                    //         Icons.vertical_align_top),
-                                    //     color: Colors.transparent,
-                                    //     onTap: (handler) {}),
-                                  ],
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        left: BorderSide(
-                                          color: data.category.toLowerCase() ==
-                                                  "work"
-                                              ? Colors.greenAccent
-                                              : data.category.toLowerCase() ==
-                                                      "school"
-                                                  ? Colors.blueAccent
-                                                  : data.category
-                                                              .toLowerCase() ==
-                                                          "uncategorised"
-                                                      ? Colors.redAccent
-                                                      : data.category
-                                                                  .toLowerCase() ==
-                                                              "coding"
-                                                          ? Colors.tealAccent
-                                                          : Colors.purpleAccent,
-                                          width: 4,
-                                        ),
                                       ),
-                                      // borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: ListTile(
-                                      onTap: (() {
-                                        setState(() {
-                                          // editData = data.content.toString();
-                                          // print(data.id);
-                                          editData = {
-                                            'content': data.content,
-                                            'category': data.category,
-                                            'id': data.id,
-                                            'date': data.date,
-                                          };
-                                        });
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) {
-                                              // editData = data.content;
-                                              return Edit();
-                                            },
-                                          ),
-                                        );
-                                      }),
-                                      title: Text(data.content),
-                                      subtitle: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(data.category),
-                                          Text(data.date),
-                                        ],
-                                      ),
-                                      style: ListTileStyle.drawer,
                                     ),
                                   ),
-                                ),
-                              ),
+                                );
+                              },
                             ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                );
-              }
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: LinearProgressIndicator());
-              } else {
-                return const Center(child: Text("No note"));
-              }
-            },
-          ),
+                          ),
+                        ),
+                      );
+                    }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: LinearProgressIndicator());
+                    } else {
+                      return const Center(child: Text("No note"));
+                    }
+                  },
+                ),
         ),
       ),
     );
@@ -211,7 +224,89 @@ class _HomeState extends State<Home> {
   }
 }
 
+class Search extends StatefulWidget {
+  const Search({Key? key}) : super(key: key);
 
+  @override
+  _SearchState createState() => _SearchState();
+}
+
+class _SearchState extends State<Search> {
+  @override
+  Widget build(BuildContext context) {
+    var listen = context.select((Prov myProv) => myProv);
+    listen.changeData(result);
+    var list = listen.getData;
+    return list != null
+        ? Container(
+            height: MediaQuery.of(context).size.height - 150,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: list.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        color: list[index].category.toLowerCase() == "work"
+                            ? Colors.greenAccent
+                            : list[index].category.toLowerCase() == "school"
+                                ? Colors.blueAccent
+                                : list[index].category.toLowerCase() ==
+                                        "uncategorised"
+                                    ? Colors.redAccent
+                                    : list[index].category.toLowerCase() ==
+                                            "coding"
+                                        ? Colors.tealAccent
+                                        : Colors.purpleAccent,
+                        width: 4,
+                      ),
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ListTile(
+                    onTap: (() {
+                      setState(() {
+                        // editData = data.content.toString();
+                        // print(data.id);
+                        editData = {
+                          'content': list[index].content,
+                          'category': list[index].category,
+                          'id': list[index].id,
+                          'date': list[index].date,
+                        };
+                      });
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            // editData = data.content;
+                            return Edit();
+                          },
+                        ),
+                      );
+                    }),
+                    title: Text(list[index].content),
+                    subtitle: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(list[index].category),
+                        Text(list[index].date),
+                      ],
+                    ),
+                    style: ListTileStyle.drawer,
+                  ),
+                );
+              },
+            ),
+          )
+        : Container(
+            child: Center(
+              child: Text('No match'),
+            ),
+          );
+  }
+}
 
 class Edit extends StatefulWidget {
   const Edit({Key? key}) : super(key: key);
