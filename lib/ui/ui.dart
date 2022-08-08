@@ -89,20 +89,20 @@ class _UIState extends State<UI> {
           barHeight: 60,
           selectedIndex: cIndex,
           items: items,
-          backgroundColor: Color.fromARGB(255, 247, 185, 185),
+          backgroundColor: Theme.of(context).backgroundColor,
           onItemSelect: (value) {
             setState(() {
               cIndex = value;
               pager(value);
             });
           },
-          itemHoverColor: Color(0xfff5dd90),
-          itemHoverColorOpacity: .5,
+          itemHoverColor: Theme.of(context).primaryColorLight,
+          itemHoverColorOpacity: .2,
           activeIconColor: Colors.black,
           deActiveIconColor: Color.fromARGB(255, 0, 0, 0),
           barRadius: 30,
           textStyle: TextStyle(
-            color: Color.fromARGB(255, 124, 115, 115),
+            color: Theme.of(context).hintColor,
             fontWeight: FontWeight.bold,
             fontSize: 14,
           ),
@@ -113,6 +113,7 @@ class _UIState extends State<UI> {
         ///AppBar
         appBar: AppBar(
           title: const Text("Note Pad"),
+          backgroundColor: Theme.of(context).backgroundColor,
 
           ///actions
           actions: [

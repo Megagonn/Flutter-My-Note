@@ -28,10 +28,11 @@ void main() {
 
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(
-        create: (context) => Prov(),
-        // child: const MyApp(),
-      ),],
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => Prov(),
+        ),
+      ],
       child: const MyApp(),
     ),
   );
@@ -49,8 +50,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        primaryColor: const Color(0xffea8c55),
+        backgroundColor: const Color(0xffea8c55),
         primaryColorLight: const Color(0xfff5dd90),
+        hintColor: const Color(0xffffffff)
       ),
       home: const UI(),
       routes: {
