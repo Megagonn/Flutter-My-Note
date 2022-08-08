@@ -1,17 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:notepad2/database/dbmodel.dart';
 
-class Prov extends ChangeNotifier {
-  List? result;
+// class Prov extends ChangeNotifier {
+//   List? result;
 
-  getDb() async {
-    result = await DbModel.db.getData();
-  }
+//   getDb() async {
+//     result = await DbModel.db.getData();
+//   }
 
-  List? get getData => result;
+//   List? get getData => result;
 
-  changeData(val) {
-    result = val;
-    notifyListeners();
-  }
-}
+//   changeData(val) {
+//     result = val;
+//     notifyListeners();
+//   }
+// }

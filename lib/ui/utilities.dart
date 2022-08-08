@@ -1,5 +1,7 @@
+// ignore_for_file: prefer_typing_uninitialized_variables
+
 import 'package:flutter/material.dart';
-import 'package:flutter_launcher_icons/utils.dart';
+// import 'package:flutter_launcher_icons/utils.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
 import 'package:intl/intl.dart';
@@ -20,7 +22,6 @@ class Home extends StatefulWidget {
 // var data;
 var dateFormat = DateFormat();
 var editData;
-
 var allData;
 
 class _HomeState extends State<Home> {
@@ -31,19 +32,24 @@ class _HomeState extends State<Home> {
     return datase;
   }
 
+  List searchData = [];
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
-          child: isSearching()
-              ? Search()
+          child: isSearching
+              ? Search(
+                  list: searchData,
+                )
               : FutureBuilder(
                   future: data(),
                   //  isSearching() == false ? returnResult() :  ,
                   builder: (context, AsyncSnapshot<dynamic> snapshot) {
                     if (snapshot.data != null) {
+                      searchData = snapshot.data;
                       return AnimationLimiter(
                         // ignore: sized_box_for_whitespace
                         child: SingleChildScrollView(
@@ -224,89 +230,95 @@ class _HomeState extends State<Home> {
   }
 }
 
-class Search extends StatefulWidget {
-  const Search({Key? key}) : super(key: key);
+// class Search extends StatefulWidget {
+//   const Search({Key? key, required this.list}) : super(key: key);
+//   final dynamic list;
+//   @override
+//   _SearchState createState() => _SearchState();
+// }
 
-  @override
-  _SearchState createState() => _SearchState();
-}
-
-class _SearchState extends State<Search> {
-  @override
-  Widget build(BuildContext context) {
-    var listen = context.select((Prov myProv) => myProv);
-    listen.changeData(result);
-    var list = listen.getData;
-    return list != null
-        ? Container(
-            height: MediaQuery.of(context).size.height - 150,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: list.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      left: BorderSide(
-                        color: list[index].category.toLowerCase() == "work"
-                            ? Colors.greenAccent
-                            : list[index].category.toLowerCase() == "school"
-                                ? Colors.blueAccent
-                                : list[index].category.toLowerCase() ==
-                                        "uncategorised"
-                                    ? Colors.redAccent
-                                    : list[index].category.toLowerCase() ==
-                                            "coding"
-                                        ? Colors.tealAccent
-                                        : Colors.purpleAccent,
-                        width: 4,
-                      ),
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ListTile(
-                    onTap: (() {
-                      setState(() {
-                        // editData = data.content.toString();
-                        // print(data.id);
-                        editData = {
-                          'content': list[index].content,
-                          'category': list[index].category,
-                          'id': list[index].id,
-                          'date': list[index].date,
-                        };
-                      });
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            // editData = data.content;
-                            return Edit();
-                          },
-                        ),
-                      );
-                    }),
-                    title: Text(list[index].content),
-                    subtitle: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(list[index].category),
-                        Text(list[index].date),
-                      ],
-                    ),
-                    style: ListTileStyle.drawer,
-                  ),
-                );
-              },
-            ),
-          )
-        : Container(
-            child: Center(
-              child: Text('No match'),
-            ),
-          );
-  }
-}
+// class _SearchState extends State<Search> {
+//   @override
+//   Widget build(BuildContext context) {
+//     var listen = context.watch<Prov>().result ?? '';
+//     // print(listen.getData);
+//     // listen.changeData(result);
+//     // var kist = datas.where((element) => element['content'].contains(val));
+//     // var word = textEditingController;
+//     List list = listen.isEmpty
+//         ? widget.list
+//         : widget.list.where((element) => element['content'].contains(listen));
+//     print([list, listen]);
+//     return list.isNotEmpty
+//         ? Container(
+//             height: MediaQuery.of(context).size.height - 150,
+//             child: ListView.builder(
+//               shrinkWrap: true,
+//               itemCount: list.length,
+//               itemBuilder: (BuildContext context, int index) {
+//                 var data = Note.fromMap(list[index]);
+//                 return Container(
+//                   decoration: BoxDecoration(
+//                     border: Border(
+//                       left: BorderSide(
+//                         color: data.category.toLowerCase() == "work"
+//                             ? Colors.greenAccent
+//                             : data.category.toLowerCase() == "school"
+//                                 ? Colors.blueAccent
+//                                 : data.category.toLowerCase() == "uncategorised"
+//                                     ? Colors.redAccent
+//                                     : data.category.toLowerCase() == "coding"
+//                                         ? Colors.tealAccent
+//                                         : Colors.purpleAccent,
+//                         width: 4,
+//                       ),
+//                     ),
+//                     // borderRadius: BorderRadius.circular(10),
+//                   ),
+//                   child: ListTile(
+//                     onTap: (() {
+//                       setState(() {
+//                         // editData = data.content.toString();
+//                         // print(data.id);
+//                         editData = {
+//                           'content': data.content,
+//                           'category': data.category,
+//                           'id': data.id,
+//                           'date': data.date,
+//                         };
+//                       });
+//                       Navigator.push(
+//                         context,
+//                         MaterialPageRoute(
+//                           builder: (context) {
+//                             // editData = data.content;
+//                             return Edit();
+//                           },
+//                         ),
+//                       );
+//                     }),
+//                     title: Text(data.content),
+//                     subtitle: Row(
+//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                       children: [
+//                         Text(data.category),
+//                         Text(data.date),
+//                       ],
+//                     ),
+//                     style: ListTileStyle.drawer,
+//                   ),
+//                 );
+//               },
+//             ),
+//           )
+//         : const Center(
+//             child: Text('No match'),
+//           );
+//     // return Center(
+//     //   child: Text('data'),
+//     // );
+//   }
+// }
 
 class Edit extends StatefulWidget {
   const Edit({Key? key}) : super(key: key);

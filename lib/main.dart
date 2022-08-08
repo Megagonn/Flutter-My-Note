@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:notepad2/ui/ui.dart';
 import 'package:sqflite/sqflite.dart';
@@ -8,11 +9,32 @@ import 'package:provider/provider.dart';
 import '../provider/provider.dart';
 
 void main() {
-  if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-    databaseFactory = databaseFactoryFfi;
+  try {
+    if (defaultTargetPlatform == TargetPlatform.linux ||
+        defaultTargetPlatform == TargetPlatform.macOS ||
+        defaultTargetPlatform == TargetPlatform.windows) {
+      databaseFactory = databaseFactoryFfi;
+    }
+    // try {
+    //   databaseFactory = databaseFactory;
+    // } on Exception catch (e) {
+    //   // TODO
+    // }
+  } on Exception catch (e) {
+    if (kDebugMode) {
+      print(e.toString());
+    }
   }
-  
-  runApp(const MyApp());
+
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(
+        create: (context) => Prov(),
+        // child: const MyApp(),
+      ),],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -21,33 +43,23 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => Prov(),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          // This is the theme of your application.
-          //
-          // Try running your application with "flutter run". You'll see the
-          // application has a blue toolbar. Then, without quitting the app, try
-          // changing the primarySwatch below to Colors.green and then invoke
-          // "hot reload" (press "r" in the console where you ran "flutter run",
-          // or simply save your changes to "hot reload" in a Flutter IDE).
-          // Notice that the counter didn't reset back to zero; the application
-          // is not restarted.
-          // primarySwatch: Color(0xfff5dd90),
-          primaryColor: Color(0xfff5dd90),
-        ),
-        home: UI(),
-        routes: {
-          "/inp": (context) {
-            return MyInput();
-          }
-        },
-
-        // UI(),
+    // var prov = context.select((Prov myprov) => myprov);
+    // prov.getData;
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primaryColor: const Color(0xffea8c55),
+        primaryColorLight: const Color(0xfff5dd90),
       ),
+      home: const UI(),
+      routes: {
+        "/inp": (context) {
+          return const MyInput();
+        }
+      },
+
+      // UI(),
     );
   }
 }

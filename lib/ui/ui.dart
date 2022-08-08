@@ -20,13 +20,26 @@ class UI extends StatefulWidget {
 }
 
 ///Search enabler
-var searchIt = true;
-bool isSearching() {
-  return !searchIt;
-}
+// bool isSearching() {
+//   return !searchIt;
+// }
 
 ///search result
 List result = [];
+bool isSearching = false;
+TextEditingController textEditingController = TextEditingController();
+
+class Prov extends ChangeNotifier {
+  String? result;
+
+  String? get getData => textEditingController.text;
+
+  changeData() {
+    result = getData;
+    print(getData);
+    notifyListeners();
+  }
+}
 
 class _UIState extends State<UI> {
   Key key = Key("ade");
@@ -39,104 +52,102 @@ class _UIState extends State<UI> {
 
   var cIndex;
 
-  search(val) async {
-    List datas = await DbModel.db.getData();
-    var prov = context.select((Prov myProv) => myProv);
-    var kist = datas.where((element) => element['content'].contains(val));
-    setState(() {
-      result.addAll(kist);
-    });
-    prov.changeData(result);
-  }
+  // search(val) async {
+  //   List datas = await DbModel.db.getData();
+  //   var prov = context.select((Prov myProv) => myProv);
+  //   var kist = datas.where((element) => element['content'].contains(val));
+  //   setState(() {
+  //     result.addAll(kist);
+  //   });
+  //   prov.changeData(result);
+  // }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     cIndex = 0;
+    // var prov = context.select((Prov myprov) => myprov);
+    // prov.getData;
+    // Prov().
     // searchIt = true;
     // textEditingController.text = editText;
   }
 
-  TextEditingController textEditingController = TextEditingController();
   PageController pageController = PageController();
   int currentIndex = 1;
 
   @override
   Widget build(BuildContext context) {
+    // var prov = context.select((Prov myprov) => myprov);
+    // prov.getData;
     return MaterialApp(
-      theme: ThemeData(
-        primaryColor: Color(0xffea8c55),
-        primaryColorLight: Color(0xfff5dd90),
-      ),
       debugShowCheckedModeBanner: false,
-      home: SafeArea(
-        child: Scaffold(
-          ///Bottom NavBar
-          bottomNavigationBar: BottomAnimation(
-            selectedIndex: cIndex,
-            items: items,
-            backgroundColor: Color.fromARGB(255, 247, 185, 185),
-            onItemSelect: (value) {
-              setState(() {
-                cIndex = value;
-                pager(value);
-              });
-            },
-            itemHoverColor: Color(0xfff5dd90),
-            itemHoverColorOpacity: .5,
-            activeIconColor: Colors.black,
-            deActiveIconColor: Color.fromARGB(255, 0, 0, 0),
-            barRadius: 30,
-            textStyle: TextStyle(
-              color: Color.fromARGB(255, 124, 115, 115),
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
-            itemHoverWidth: 135,
-            itemHoverBorderRadius: 30,
+      home: Scaffold(
+        ///Bottom NavBar
+        bottomNavigationBar: BottomAnimation(
+          selectedIndex: cIndex,
+          items: items,
+          backgroundColor: Color.fromARGB(255, 247, 185, 185),
+          onItemSelect: (value) {
+            setState(() {
+              cIndex = value;
+              pager(value);
+            });
+          },
+          itemHoverColor: Color(0xfff5dd90),
+          itemHoverColorOpacity: .5,
+          activeIconColor: Colors.black,
+          deActiveIconColor: Color.fromARGB(255, 0, 0, 0),
+          barRadius: 30,
+          textStyle: TextStyle(
+            color: Color.fromARGB(255, 124, 115, 115),
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
           ),
+          itemHoverWidth: 135,
+          itemHoverBorderRadius: 30,
+        ),
 
-          ///AppBar
-          appBar: AppBar(
-            title: const Text("Note Pad"),
+        ///AppBar
+        appBar: AppBar(
+          title: const Text("Note Pad"),
 
-            ///actions
-            actions: [
-              isSearching()
-                  ? SizedBox(
-                      width: 140,
-                      child: TextField(
-                        controller: textEditingController,
-                        onEditingComplete: () {
-                          setState(() {
-                            searchIt = true;
-                            isSearching();
-                            search(textEditingController.text);
-                            returnResult();
-                          });
-                          textEditingController.clear();
-                        },
-                        decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Color(0xfff5dd90),
-                            hintText: 'search'),
-                      ),
-                    )
-                  : SizedBox(),
-              IconButton(
-                  onPressed: () {
-                    setState(() {
-                      searchIt = false;
-                      isSearching();
-                    });
-                  },
-                  icon: Icon(CupertinoIcons.search))
-            ],
-          ),
+          ///actions
+          actions: [
+            isSearching
+                ? SizedBox(
+                    height: 30,
+                    width: 140,
+                    child: TextField(
+                      controller: textEditingController,
+                      onChanged: (value) {
+                        setState(() {
+                          Prov().changeData();
+                        });
+                        
+                      },
+                      decoration: InputDecoration(
+                          filled: true,
+                          // fillColor: Color(0xfff5dd90),
+                          hintText: 'Search'),
+                    ),
+                  )
+                : SizedBox.shrink(),
+            IconButton(
+                onPressed: () {
+                  setState(() {
+                    isSearching = !isSearching;
+                    textEditingController.clear();
+                  });
+                },
+                icon: Icon(isSearching ? Icons.close : CupertinoIcons.search))
+          ],
+        ),
 
-          ///Body
-          body: PageView(
+        ///Body
+        body: SafeArea(
+          child: PageView(
             controller: pageController,
             onPageChanged: (val) {
               setState(() {
@@ -164,10 +175,6 @@ returnResult() {
   return result;
 }
 
-var cat;
-var cont;
-var addNote;
-
 class MyInput extends StatefulWidget {
   const MyInput({Key? key}) : super(key: key);
 
@@ -176,6 +183,9 @@ class MyInput extends StatefulWidget {
 }
 
 class _MyInputState extends State<MyInput> {
+  var cat;
+  var cont;
+  var addNote;
   TextEditingController textEditingController = TextEditingController();
   var dateFormat = DateFormat();
   @override
@@ -251,5 +261,183 @@ class _MyInputState extends State<MyInput> {
         ),
       ),
     );
+  }
+}
+
+class Search extends StatefulWidget {
+  const Search({Key? key, required this.list}) : super(key: key);
+  final dynamic list;
+  @override
+  _SearchState createState() => _SearchState();
+}
+
+class _SearchState extends State<Search> {
+  data() async {
+    var datase = await DbModel.db.getData();
+    allData = datase;
+    return datase;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // var listen = context.watch<Prov>().result ?? '';
+    // print(listen.getData);
+    // listen.changeData(result);
+    // var kist = datas.where((element) => element['content'].contains(val));
+    // var word = textEditingController.text;
+    // List list = word.isEmpty
+    //     ? widget.list
+    //     : widget.list.where((element) => element['content'].contains(word));
+    // print([list, word]);
+    // return list.isNotEmpty
+    //     ? Container(
+    //         height: MediaQuery.of(context).size.height - 150,
+    //         child: ListView.builder(
+    //           shrinkWrap: true,
+    //           itemCount: list.length,
+    //           itemBuilder: (BuildContext context, int index) {
+    //             var data = Note.fromMap(list[index]);
+    //             return Container(
+    //               decoration: BoxDecoration(
+    //                 border: Border(
+    //                   left: BorderSide(
+    //                     color: data.category.toLowerCase() == "work"
+    //                         ? Colors.greenAccent
+    //                         : data.category.toLowerCase() == "school"
+    //                             ? Colors.blueAccent
+    //                             : data.category.toLowerCase() == "uncategorised"
+    //                                 ? Colors.redAccent
+    //                                 : data.category.toLowerCase() == "coding"
+    //                                     ? Colors.tealAccent
+    //                                     : Colors.purpleAccent,
+    //                     width: 4,
+    //                   ),
+    //                 ),
+    //                 // borderRadius: BorderRadius.circular(10),
+    //               ),
+    //               child: ListTile(
+    //                 onTap: (() {
+    //                   setState(() {
+    //                     // editData = data.content.toString();
+    //                     // print(data.id);
+    //                     editData = {
+    //                       'content': data.content,
+    //                       'category': data.category,
+    //                       'id': data.id,
+    //                       'date': data.date,
+    //                     };
+    //                   });
+    //                   Navigator.push(
+    //                     context,
+    //                     MaterialPageRoute(
+    //                       builder: (context) {
+    //                         // editData = data.content;
+    //                         return Edit();
+    //                       },
+    //                     ),
+    //                   );
+    //                 }),
+    //                 title: Text(data.content),
+    //                 subtitle: Row(
+    //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //                   children: [
+    //                     Text(data.category),
+    //                     Text(data.date),
+    //                   ],
+    //                 ),
+    //                 style: ListTileStyle.drawer,
+    //               ),
+    //             );
+    //           },
+    //         ),
+    //       )
+    //     : const Center(
+    //         child: Text('No match'),
+    //       );
+    // return Center(
+    //   child: Text('data'),
+    // );
+
+    return FutureBuilder(
+        future: data(),
+        builder: (context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+            // return SizedBox.shrink();
+          } else {
+            List data = snapshot.data;
+            var word = context.watch<Prov>().getData!.toLowerCase();
+            print(word);
+            var list = word.isEmpty
+                ? snapshot.data
+                : data
+                    .where((element) =>
+                        element['content'].toString().contains(word))
+                    .toList();
+            // print(list);
+            return Container(
+              height: MediaQuery.of(context).size.height - 150,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: list.length,
+                itemBuilder: (BuildContext context, int index) {
+                  var data = Note.fromMap(list[index]);
+                  return Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        left: BorderSide(
+                          color: data.category.toLowerCase() == "work"
+                              ? Colors.greenAccent
+                              : data.category.toLowerCase() == "school"
+                                  ? Colors.blueAccent
+                                  : data.category.toLowerCase() ==
+                                          "uncategorised"
+                                      ? Colors.redAccent
+                                      : data.category.toLowerCase() == "coding"
+                                          ? Colors.tealAccent
+                                          : Colors.purpleAccent,
+                          width: 4,
+                        ),
+                      ),
+                      // borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ListTile(
+                      onTap: (() {
+                        setState(() {
+                          // editData = data.content.toString();
+                          // print(data.id);
+                          editData = {
+                            'content': data.content,
+                            'category': data.category,
+                            'id': data.id,
+                            'date': data.date,
+                          };
+                        });
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              // editData = data.content;
+                              return Edit();
+                            },
+                          ),
+                        );
+                      }),
+                      title: Text(data.content),
+                      subtitle: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(data.category),
+                          Text(data.date),
+                        ],
+                      ),
+                      style: ListTileStyle.drawer,
+                    ),
+                  );
+                },
+              ),
+            );
+          }
+        });
   }
 }
