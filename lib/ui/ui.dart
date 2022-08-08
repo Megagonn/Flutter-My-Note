@@ -28,9 +28,11 @@ class UI extends StatefulWidget {
 List result = [];
 bool isSearching = false;
 TextEditingController textEditingController = TextEditingController();
+// bool sort = false;
 
 class Prov extends ChangeNotifier {
   String? get getData => textEditingController.text;
+  // bool get getSort => sort;
   changeData() {
     // print(getData);
     notifyListeners();
@@ -42,7 +44,7 @@ class _UIState extends State<UI> {
 
   var items = <BottomNavItem>[
     BottomNavItem(title: 'Home', widget: Icon(Icons.home_outlined)),
-    BottomNavItem(title: 'Add note', widget: Icon(Icons.add)),
+    BottomNavItem(title: 'Add note', widget: Icon(Icons.note_add_outlined)),
     BottomNavItem(title: 'Category', widget: Icon(Icons.category_outlined)),
   ];
 
@@ -118,7 +120,7 @@ class _UIState extends State<UI> {
             IconButton(
                 onPressed: () {
                   setState(() {
-                   !isSearching ? pageController.jumpToPage(0) : null;
+                    !isSearching ? pageController.jumpToPage(0) : null;
                     !isSearching ? cIndex = 0 : null;
                     // currentIndex = 0;
                     isSearching = !isSearching;
@@ -234,8 +236,9 @@ class _MyInputState extends State<MyInput> {
               });
             }
           },
+          backgroundColor: const Color(0xffea8c55),
           child: Icon(
-            Icons.send_outlined,
+            Icons.save_alt_outlined,
           ),
         ),
       ),
@@ -268,7 +271,7 @@ class _SearchState extends State<Search> {
           } else {
             List data = snapshot.data;
             var word = context.watch<Prov>().getData!.toLowerCase();
-            // print(word);
+            print(word);
             var list = word.isEmpty
                 ? snapshot.data
                 : data
