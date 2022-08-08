@@ -205,7 +205,9 @@ class _MyInputState extends State<MyInput> {
                   });
                 },
                 decoration: InputDecoration(
-                  hintText: "Category",
+                  border: InputBorder.none,
+                  icon: Icon(Icons.category, color: const Color(0xffea8c55)),
+                  hintText: "Select category",
                 ),
                 // ignore: prefer_const_literals_to_create_immutables
                 items: [
@@ -223,7 +225,7 @@ class _MyInputState extends State<MyInput> {
                   ),
                   DropdownMenuItem(child: Text('Others'), value: 'Others'),
                 ],
-                isExpanded: true,
+                // isExpanded: true,
               ),
               TextField(
                 controller: textEditingController,
