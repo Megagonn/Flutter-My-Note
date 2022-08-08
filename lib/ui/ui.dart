@@ -30,12 +30,8 @@ bool isSearching = false;
 TextEditingController textEditingController = TextEditingController();
 
 class Prov extends ChangeNotifier {
-  String? result;
-
   String? get getData => textEditingController.text;
-
   changeData() {
-    result = getData;
     print(getData);
     notifyListeners();
   }
@@ -127,7 +123,6 @@ class _UIState extends State<UI> {
                         setState(() {
                           Prov().changeData();
                         });
-                        
                       },
                       decoration: InputDecoration(
                           filled: true,
@@ -139,6 +134,8 @@ class _UIState extends State<UI> {
             IconButton(
                 onPressed: () {
                   setState(() {
+                    cIndex = 0;
+                    currentIndex = 0;
                     isSearching = !isSearching;
                     textEditingController.clear();
                   });
@@ -151,13 +148,14 @@ class _UIState extends State<UI> {
         body: SafeArea(
           child: PageView(
             controller: pageController,
+            physics: const ScrollPhysics(),
             onPageChanged: (val) {
               setState(() {
                 currentIndex = val;
                 pageController.jumpToPage(val);
               });
             },
-            children: [Home(), MyInput(), Category()],
+            children:const [Home(), MyInput(), Category()],
           ),
         ),
       ),
@@ -172,10 +170,10 @@ class _UIState extends State<UI> {
   }
 }
 
-returnResult() {
-  // print('this is result $result');
-  return result;
-}
+// returnResult() {
+//   // print('this is result $result');
+//   return result;
+// }
 
 class MyInput extends StatefulWidget {
   const MyInput({Key? key}) : super(key: key);
@@ -195,7 +193,7 @@ class _MyInputState extends State<MyInput> {
     return SafeArea(
       child: Scaffold(
         body: Container(
-          padding: EdgeInsets.all(20),
+          // padding: EdgeInsets.all(20),
           height: double.infinity / 2,
           child: Column(
             children: [
@@ -229,20 +227,21 @@ class _MyInputState extends State<MyInput> {
               ),
               TextField(
                 controller: textEditingController,
-                onChanged: (val) {
-                  // cont = textEditingController.value;
-                },
                 decoration: InputDecoration(
-                  hintText: "Note...",
+                  hintText: "Add note...",
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.all(5 )
                 ),
-                maxLines: 15,
+                maxLines: null,
+                minLines: 8,
+                
               ),
             ],
           ),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            if (textEditingController.text != '') {
+            if (textEditingController.text.trim() != '') {
               Note note = Note(
                 content: textEditingController.text.trim(),
                 category: cat,
