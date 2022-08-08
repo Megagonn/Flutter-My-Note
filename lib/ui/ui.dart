@@ -86,6 +86,7 @@ class _UIState extends State<UI> {
       home: Scaffold(
         ///Bottom NavBar
         bottomNavigationBar: BottomAnimation(
+          barHeight: 60,
           selectedIndex: cIndex,
           items: items,
           backgroundColor: Color.fromARGB(255, 247, 185, 185),

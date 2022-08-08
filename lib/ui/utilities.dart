@@ -54,7 +54,7 @@ class _HomeState extends State<Home> {
                         // ignore: sized_box_for_whitespace
                         child: SingleChildScrollView(
                           scrollDirection: Axis.vertical,
-                          child: Container(
+                          child: SizedBox(
                             height: MediaQuery.of(context).size.height - 150,
                             child: ListView.builder(
                               shrinkWrap: true,
@@ -65,11 +65,11 @@ class _HomeState extends State<Home> {
                                   position: index,
                                   duration: const Duration(milliseconds: 375),
                                   child: SlideAnimation(
-                                    duration: Duration(seconds: 1),
+                                    duration: const Duration(seconds: 1),
                                     curve: Curves.easeInOutSine,
                                     verticalOffset: 50.0,
                                     child: FadeInAnimation(
-                                      duration: Duration(seconds: 1),
+                                      duration: const Duration(seconds: 1),
                                       curve: Curves.easeInOutSine,
                                       child: SwipeActionCell(
                                         key: ValueKey(allData[index]),
@@ -172,7 +172,7 @@ class _HomeState extends State<Home> {
                                                 MaterialPageRoute(
                                                   builder: (context) {
                                                     // editData = data.content;
-                                                    return Edit();
+                                                    return const Edit();
                                                   },
                                                 ),
                                               );
@@ -355,11 +355,11 @@ class _EditState extends State<Edit> {
               setState(() {
                 textEditingController.clear();
                 Navigator.pushReplacement(
-                    context, MaterialPageRoute(builder: (context) => UI()));
+                    context, MaterialPageRoute(builder: (context) => const UI()));
               });
             }
           },
-          child: Icon(
+          child: const Icon(
             Icons.send_outlined,
           ),
         ),
@@ -390,7 +390,7 @@ class Category extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         body: Container(
-          child: Text('Categories...'),
+          child: const Text('Categories...'),
         ),
       ),
     );
