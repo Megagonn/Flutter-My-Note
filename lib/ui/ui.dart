@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, prefer_typing_uninitialized_variables
 
 import 'package:bottom_animation/bottom_animation.dart';
 import 'package:flutter/cupertino.dart';
@@ -32,7 +32,7 @@ TextEditingController textEditingController = TextEditingController();
 class Prov extends ChangeNotifier {
   String? get getData => textEditingController.text;
   changeData() {
-    print(getData);
+    // print(getData);
     notifyListeners();
   }
 }
@@ -48,26 +48,10 @@ class _UIState extends State<UI> {
 
   var cIndex;
 
-  // search(val) async {
-  //   List datas = await DbModel.db.getData();
-  //   var prov = context.select((Prov myProv) => myProv);
-  //   var kist = datas.where((element) => element['content'].contains(val));
-  //   setState(() {
-  //     result.addAll(kist);
-  //   });
-  //   prov.changeData(result);
-  // }
-
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     cIndex = 0;
-    // var prov = context.select((Prov myprov) => myprov);
-    // prov.getData;
-    // Prov().
-    // searchIt = true;
-    // textEditingController.text = editText;
   }
 
   PageController pageController = PageController();
@@ -134,8 +118,9 @@ class _UIState extends State<UI> {
             IconButton(
                 onPressed: () {
                   setState(() {
-                    cIndex = 0;
-                    currentIndex = 0;
+                   !isSearching ? pageController.jumpToPage(0) : null;
+                    !isSearching ? cIndex = 0 : null;
+                    // currentIndex = 0;
                     isSearching = !isSearching;
                     textEditingController.clear();
                   });
@@ -155,7 +140,7 @@ class _UIState extends State<UI> {
                 pageController.jumpToPage(val);
               });
             },
-            children:const [Home(), MyInput(), Category()],
+            children: const [Home(), MyInput(), Category()],
           ),
         ),
       ),
@@ -169,11 +154,6 @@ class _UIState extends State<UI> {
     });
   }
 }
-
-// returnResult() {
-//   // print('this is result $result');
-//   return result;
-// }
 
 class MyInput extends StatefulWidget {
   const MyInput({Key? key}) : super(key: key);
@@ -192,12 +172,11 @@ class _MyInputState extends State<MyInput> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Container(
+        body: SizedBox(
           // padding: EdgeInsets.all(20),
           height: double.infinity / 2,
           child: Column(
             children: [
-              // ignore: prefer_const_literals_to_create_immutables
               DropdownButtonFormField(
                 onChanged: (val) {
                   setState(() {
@@ -209,8 +188,7 @@ class _MyInputState extends State<MyInput> {
                   icon: Icon(Icons.category, color: const Color(0xffea8c55)),
                   hintText: "Select category",
                 ),
-                // ignore: prefer_const_literals_to_create_immutables
-                items: [
+                items: const [
                   DropdownMenuItem(
                     child: Text("Work"),
                     value: 'Work',
@@ -230,13 +208,11 @@ class _MyInputState extends State<MyInput> {
               TextField(
                 controller: textEditingController,
                 decoration: InputDecoration(
-                  hintText: "Add note...",
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.all(5 )
-                ),
+                    hintText: "Add note...",
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.all(5)),
                 maxLines: null,
                 minLines: 8,
-                
               ),
             ],
           ),
@@ -283,84 +259,6 @@ class _SearchState extends State<Search> {
 
   @override
   Widget build(BuildContext context) {
-    // var listen = context.watch<Prov>().result ?? '';
-    // print(listen.getData);
-    // listen.changeData(result);
-    // var kist = datas.where((element) => element['content'].contains(val));
-    // var word = textEditingController.text;
-    // List list = word.isEmpty
-    //     ? widget.list
-    //     : widget.list.where((element) => element['content'].contains(word));
-    // print([list, word]);
-    // return list.isNotEmpty
-    //     ? Container(
-    //         height: MediaQuery.of(context).size.height - 150,
-    //         child: ListView.builder(
-    //           shrinkWrap: true,
-    //           itemCount: list.length,
-    //           itemBuilder: (BuildContext context, int index) {
-    //             var data = Note.fromMap(list[index]);
-    //             return Container(
-    //               decoration: BoxDecoration(
-    //                 border: Border(
-    //                   left: BorderSide(
-    //                     color: data.category.toLowerCase() == "work"
-    //                         ? Colors.greenAccent
-    //                         : data.category.toLowerCase() == "school"
-    //                             ? Colors.blueAccent
-    //                             : data.category.toLowerCase() == "uncategorised"
-    //                                 ? Colors.redAccent
-    //                                 : data.category.toLowerCase() == "coding"
-    //                                     ? Colors.tealAccent
-    //                                     : Colors.purpleAccent,
-    //                     width: 4,
-    //                   ),
-    //                 ),
-    //                 // borderRadius: BorderRadius.circular(10),
-    //               ),
-    //               child: ListTile(
-    //                 onTap: (() {
-    //                   setState(() {
-    //                     // editData = data.content.toString();
-    //                     // print(data.id);
-    //                     editData = {
-    //                       'content': data.content,
-    //                       'category': data.category,
-    //                       'id': data.id,
-    //                       'date': data.date,
-    //                     };
-    //                   });
-    //                   Navigator.push(
-    //                     context,
-    //                     MaterialPageRoute(
-    //                       builder: (context) {
-    //                         // editData = data.content;
-    //                         return Edit();
-    //                       },
-    //                     ),
-    //                   );
-    //                 }),
-    //                 title: Text(data.content),
-    //                 subtitle: Row(
-    //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //                   children: [
-    //                     Text(data.category),
-    //                     Text(data.date),
-    //                   ],
-    //                 ),
-    //                 style: ListTileStyle.drawer,
-    //               ),
-    //             );
-    //           },
-    //         ),
-    //       )
-    //     : const Center(
-    //         child: Text('No match'),
-    //       );
-    // return Center(
-    //   child: Text('data'),
-    // );
-
     return FutureBuilder(
         future: data(),
         builder: (context, AsyncSnapshot<dynamic> snapshot) {
@@ -370,7 +268,7 @@ class _SearchState extends State<Search> {
           } else {
             List data = snapshot.data;
             var word = context.watch<Prov>().getData!.toLowerCase();
-            print(word);
+            // print(word);
             var list = word.isEmpty
                 ? snapshot.data
                 : data
@@ -378,7 +276,7 @@ class _SearchState extends State<Search> {
                         element['content'].toString().contains(word))
                     .toList();
             // print(list);
-            return Container(
+            return SizedBox(
               height: MediaQuery.of(context).size.height - 150,
               child: ListView.builder(
                 shrinkWrap: true,
