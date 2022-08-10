@@ -1,6 +1,7 @@
-// ignore_for_file: prefer_const_constructors, prefer_typing_uninitialized_variables
+// ignore_for_file: prefer_const_constructors
 
 import 'package:bottom_animation/bottom_animation.dart';
+// import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -28,30 +29,51 @@ class UI extends StatefulWidget {
 List result = [];
 bool isSearching = false;
 TextEditingController textEditingController = TextEditingController();
-// bool sort = false;
 
 class Prov extends ChangeNotifier {
+  String? result;
+
   String? get getData => textEditingController.text;
-  // bool get getSort => sort;
+
   changeData() {
-    // print(getData);
+    result = getData;
+    print(getData);
     notifyListeners();
   }
 }
 
 class _UIState extends State<UI> {
   Key key = Key("ade");
-
+  var cIndex;
   var items = <BottomNavItem>[
     BottomNavItem(title: 'Home', widget: Icon(Icons.home_outlined)),
-    BottomNavItem(title: 'Add note', widget: Icon(Icons.note_add_outlined)),
-    BottomNavItem(title: 'Category', widget: Icon(Icons.category_outlined)),
+    BottomNavItem(title: 'Add note', widget: Icon(Icons.note_add)),
   ];
-
-  var cIndex;
+  // var items = <Widget>[
+  //   // BottomNavItem(title: 'Home', widget: Icon(Icons.home_outlined)),
+  //   // BottomNavItem(title: 'Add note', widget: Icon(Icons.note_add)),
+  //   // BottomNavItem(title: 'Category', widget: Icon(Icons.category_outlined)),
+  //   Column(
+  //     children: const [
+  //       Icon(
+  //         Icons.home_outlined,
+  //         size: 34,
+  //       ),
+  //     ],
+  //   ),
+  //   Column(
+  //     children: const [
+  //       Icon(
+  //         Icons.note_add,
+  //         size: 34,
+  //       ),
+  //     ],
+  //   ),
+  // ];
 
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
     cIndex = 0;
   }
@@ -63,11 +85,24 @@ class _UIState extends State<UI> {
   Widget build(BuildContext context) {
     // var prov = context.select((Prov myprov) => myprov);
     // prov.getData;
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
+    return SafeArea(
+      child: Scaffold(
         ///Bottom NavBar
-        bottomNavigationBar: BottomAnimation(
+        bottomNavigationBar:
+            // CurvedNavigationBar(
+            //   items: items,
+            //   height: 50,
+            //   onTap: ((value) {
+            //     setState(() {
+            //       cIndex = value;
+            //       pager(value);
+            //     });
+            //   }),
+            //   color: Theme.of(context).backgroundColor,
+            //   backgroundColor: Colors.white,
+            //   buttonBackgroundColor: const Color(0xffea8c55),
+            // ),
+            BottomAnimation(
           barHeight: 60,
           selectedIndex: cIndex,
           items: items,
@@ -100,30 +135,36 @@ class _UIState extends State<UI> {
           ///actions
           actions: [
             isSearching
-                ? SizedBox(
-                    height: 30,
-                    width: 140,
-                    child: TextField(
-                      controller: textEditingController,
-                      onChanged: (value) {
-                        setState(() {
-                          Prov().changeData();
-                        });
-                      },
-                      decoration: InputDecoration(
-                          filled: true,
-                          // fillColor: Color(0xfff5dd90),
-                          hintText: 'Search'),
+                ? Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: SizedBox(
+                      height: 30,
+                      width: 140,
+                      child: TextField(
+                        controller: textEditingController,
+                        onChanged: (value) {
+                          setState(() {
+                            Prov().changeData();
+                          });
+                        },
+                        autofocus: true,
+                        cursorColor: Colors.black,
+                        decoration: InputDecoration(
+                            filled: true,
+                            border: UnderlineInputBorder(
+                                borderSide: BorderSide.none,
+                                borderRadius: BorderRadius.circular(50)),
+                            hintText: 'Search'),
+                      ),
                     ),
                   )
                 : SizedBox.shrink(),
             IconButton(
                 onPressed: () {
                   setState(() {
-                    !isSearching ? pageController.jumpToPage(0) : null;
-                    !isSearching ? cIndex = 0 : null;
-                    // currentIndex = 0;
                     isSearching = !isSearching;
+                    isSearching ? pageController.jumpToPage(0) : null;
+                    isSearching ? cIndex = 0 : null;
                     textEditingController.clear();
                   });
                 },
@@ -135,14 +176,17 @@ class _UIState extends State<UI> {
         body: SafeArea(
           child: PageView(
             controller: pageController,
-            physics: const ScrollPhysics(),
-            onPageChanged: (val) {
-              setState(() {
-                currentIndex = val;
-                pageController.jumpToPage(val);
-              });
-            },
-            children: const [Home(), MyInput(), Category()],
+            // onPageChanged: (val) {
+            //   setState(() {
+            //     currentIndex = val;
+            //     pageController.jumpToPage(val);
+            //   });
+            // },
+            children: [
+              Home(),
+              MyInput(),
+              // Category(),
+            ],
           ),
         ),
       ),
@@ -155,6 +199,11 @@ class _UIState extends State<UI> {
       pageController.jumpToPage(index);
     });
   }
+}
+
+returnResult() {
+  // print('this is result $result');
+  return result;
 }
 
 class MyInput extends StatefulWidget {
@@ -186,10 +235,10 @@ class _MyInputState extends State<MyInput> {
                   });
                 },
                 decoration: InputDecoration(
-                  border: InputBorder.none,
-                  icon: Icon(Icons.category, color: const Color(0xffea8c55)),
-                  hintText: "Select category",
-                ),
+                    border: InputBorder.none,
+                    icon: Icon(Icons.category, color: const Color(0xffea8c55)),
+                    hintText: "Select category",
+                    hintStyle: TextStyle(color: Colors.grey)),
                 items: const [
                   DropdownMenuItem(
                     child: Text("Work"),
@@ -207,14 +256,17 @@ class _MyInputState extends State<MyInput> {
                 ],
                 // isExpanded: true,
               ),
-              TextField(
-                controller: textEditingController,
-                decoration: InputDecoration(
-                    hintText: "Add note...",
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.all(5)),
-                maxLines: null,
-                minLines: 8,
+              Expanded(
+                child: TextField(
+                  controller: textEditingController,
+                  decoration: InputDecoration(
+                      hintText: "Add note...",
+                      hintStyle: TextStyle(color: Colors.grey),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.all(5)),
+                  maxLines: null,
+                  minLines: 8,
+                ),
               ),
             ],
           ),
@@ -224,7 +276,7 @@ class _MyInputState extends State<MyInput> {
             if (textEditingController.text.trim() != '') {
               Note note = Note(
                 content: textEditingController.text.trim(),
-                category: cat,
+                category: cat ?? 'Uncategorised',
                 date: dateFormat.format(DateTime.now()),
               );
               await DbModel.db.addData(note);
@@ -238,7 +290,7 @@ class _MyInputState extends State<MyInput> {
           },
           backgroundColor: const Color(0xffea8c55),
           child: Icon(
-            Icons.save_alt_outlined,
+            Icons.note_add,
           ),
         ),
       ),
@@ -266,81 +318,99 @@ class _SearchState extends State<Search> {
         future: data(),
         builder: (context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                  child: CircularProgressIndicator(
+                color: const Color(0xfff5dd90),
+              )),
+            );
             // return SizedBox.shrink();
           } else {
             List data = snapshot.data;
             var word = context.watch<Prov>().getData!.toLowerCase();
-            print(word);
+            // print(word);
             var list = word.isEmpty
                 ? snapshot.data
                 : data
-                    .where((element) =>
-                        element['content'].toString().contains(word))
+                    .where((element) => element['content']
+                        .toString()
+                        .toLowerCase()
+                        .contains(word))
                     .toList();
             // print(list);
-            return SizedBox(
-              height: MediaQuery.of(context).size.height - 150,
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: list.length,
-                itemBuilder: (BuildContext context, int index) {
-                  var data = Note.fromMap(list[index]);
-                  return Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        left: BorderSide(
-                          color: data.category.toLowerCase() == "work"
-                              ? Colors.greenAccent
-                              : data.category.toLowerCase() == "school"
-                                  ? Colors.blueAccent
-                                  : data.category.toLowerCase() ==
-                                          "uncategorised"
-                                      ? Colors.redAccent
-                                      : data.category.toLowerCase() == "coding"
-                                          ? Colors.tealAccent
-                                          : Colors.purpleAccent,
-                          width: 4,
-                        ),
-                      ),
-                      // borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: ListTile(
-                      onTap: (() {
-                        setState(() {
-                          // editData = data.content.toString();
-                          // print(data.id);
-                          editData = {
-                            'content': data.content,
-                            'category': data.category,
-                            'id': data.id,
-                            'date': data.date,
-                          };
-                        });
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              // editData = data.content;
-                              return Edit();
-                            },
+            return list.isNotEmpty
+                ? Container(
+                    height: MediaQuery.of(context).size.height - 150,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: list.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        var data = Note.fromMap(list[index]);
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              left: BorderSide(
+                                color: data.category.toLowerCase() == "work"
+                                    ? Colors.greenAccent
+                                    : data.category.toLowerCase() == "school"
+                                        ? Colors.blueAccent
+                                        : data.category.toLowerCase() ==
+                                                "uncategorised"
+                                            ? Colors.redAccent
+                                            : data.category.toLowerCase() ==
+                                                    "coding"
+                                                ? Colors.tealAccent
+                                                : Colors.purpleAccent,
+                                width: 4,
+                              ),
+                            ),
+                            // borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: ListTile(
+                            onTap: (() {
+                              setState(() {
+                                // editData = data.content.toString();
+                                // print(data.id);
+                                editData = {
+                                  'content': data.content,
+                                  'category': data.category,
+                                  'id': data.id,
+                                  'date': data.date,
+                                };
+                              });
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    // editData = data.content;
+                                    return Edit();
+                                  },
+                                ),
+                              );
+                            }),
+                            title: Text(
+                              data.content,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: false,
+                            ),
+                            subtitle: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(data.category),
+                                Text(data.date),
+                              ],
+                            ),
+                            style: ListTileStyle.drawer,
                           ),
                         );
-                      }),
-                      title: Text(data.content),
-                      subtitle: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(data.category),
-                          Text(data.date),
-                        ],
-                      ),
-                      style: ListTileStyle.drawer,
+                      },
                     ),
+                  )
+                : Center(
+                    child: Text('No match'),
                   );
-                },
-              ),
-            );
           }
         });
   }

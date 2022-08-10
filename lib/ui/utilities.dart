@@ -55,7 +55,7 @@ class _HomeState extends State<Home> {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.vertical,
                           child: SizedBox(
-                            height: MediaQuery.of(context).size.height - 150,
+                            height: MediaQuery.of(context).size.height,
                             child: ListView.builder(
                               shrinkWrap: true,
                               itemCount: snapshot.data.length,
@@ -75,6 +75,7 @@ class _HomeState extends State<Home> {
                                         key: ValueKey(allData[index]),
                                         trailingActions: [
                                           SwipeAction(
+                                              widthSpace: 180,
                                               nestedAction: SwipeNestedAction(
                                                 ///customize your nested action content
 
@@ -99,11 +100,12 @@ class _HomeState extends State<Home> {
                                                           Icons.delete,
                                                           color: Colors.white,
                                                         ),
-                                                        const Text('Del',
+                                                        const Text(
+                                                            'Delete note?',
                                                             style: TextStyle(
                                                                 color: Colors
                                                                     .white,
-                                                                fontSize: 20)),
+                                                                fontSize: 14)),
                                                       ],
                                                     ),
                                                   ),
@@ -177,7 +179,12 @@ class _HomeState extends State<Home> {
                                                 ),
                                               );
                                             }),
-                                            title: Text(data.content),
+                                            title: Text(
+                                              data.content,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              softWrap: false,
+                                            ),
                                             subtitle: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment
@@ -203,7 +210,10 @@ class _HomeState extends State<Home> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: LinearProgressIndicator());
                     } else {
-                      return const Center(child: Text("No note"));
+                      return const Padding(
+                        padding:  EdgeInsets.all(16.0),
+                        child:  Center(child: Text("No note")),
+                      );
                     }
                   },
                 ),
@@ -229,96 +239,6 @@ class _HomeState extends State<Home> {
     );
   }
 }
-
-// class Search extends StatefulWidget {
-//   const Search({Key? key, required this.list}) : super(key: key);
-//   final dynamic list;
-//   @override
-//   _SearchState createState() => _SearchState();
-// }
-
-// class _SearchState extends State<Search> {
-//   @override
-//   Widget build(BuildContext context) {
-//     var listen = context.watch<Prov>().result ?? '';
-//     // print(listen.getData);
-//     // listen.changeData(result);
-//     // var kist = datas.where((element) => element['content'].contains(val));
-//     // var word = textEditingController;
-//     List list = listen.isEmpty
-//         ? widget.list
-//         : widget.list.where((element) => element['content'].contains(listen));
-//     print([list, listen]);
-//     return list.isNotEmpty
-//         ? Container(
-//             height: MediaQuery.of(context).size.height - 150,
-//             child: ListView.builder(
-//               shrinkWrap: true,
-//               itemCount: list.length,
-//               itemBuilder: (BuildContext context, int index) {
-//                 var data = Note.fromMap(list[index]);
-//                 return Container(
-//                   decoration: BoxDecoration(
-//                     border: Border(
-//                       left: BorderSide(
-//                         color: data.category.toLowerCase() == "work"
-//                             ? Colors.greenAccent
-//                             : data.category.toLowerCase() == "school"
-//                                 ? Colors.blueAccent
-//                                 : data.category.toLowerCase() == "uncategorised"
-//                                     ? Colors.redAccent
-//                                     : data.category.toLowerCase() == "coding"
-//                                         ? Colors.tealAccent
-//                                         : Colors.purpleAccent,
-//                         width: 4,
-//                       ),
-//                     ),
-//                     // borderRadius: BorderRadius.circular(10),
-//                   ),
-//                   child: ListTile(
-//                     onTap: (() {
-//                       setState(() {
-//                         // editData = data.content.toString();
-//                         // print(data.id);
-//                         editData = {
-//                           'content': data.content,
-//                           'category': data.category,
-//                           'id': data.id,
-//                           'date': data.date,
-//                         };
-//                       });
-//                       Navigator.push(
-//                         context,
-//                         MaterialPageRoute(
-//                           builder: (context) {
-//                             // editData = data.content;
-//                             return Edit();
-//                           },
-//                         ),
-//                       );
-//                     }),
-//                     title: Text(data.content),
-//                     subtitle: Row(
-//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                       children: [
-//                         Text(data.category),
-//                         Text(data.date),
-//                       ],
-//                     ),
-//                     style: ListTileStyle.drawer,
-//                   ),
-//                 );
-//               },
-//             ),
-//           )
-//         : const Center(
-//             child: Text('No match'),
-//           );
-//     // return Center(
-//     //   child: Text('data'),
-//     // );
-//   }
-// }
 
 class Edit extends StatefulWidget {
   const Edit({Key? key}) : super(key: key);
@@ -355,23 +275,45 @@ class _EditState extends State<Edit> {
               setState(() {
                 textEditingController.clear();
                 Navigator.pushReplacement(
-                    context, MaterialPageRoute(builder: (context) => const UI()));
+                  context,
+                  MaterialPageRoute(builder: (context) => const UI()),
+                  // ModalRoute.withName('/'),
+                );
               });
             }
           },
+          backgroundColor: const Color(0xffea8c55),
           child: const Icon(
-            Icons.send_outlined,
+            Icons.note_add,
           ),
         ),
-        appBar: AppBar(),
+        appBar: AppBar(
+          title: const Text('Edit note'),
+          centerTitle: true,
+          backgroundColor: const Color(0xffea8c55),
+        ),
         body: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
           height: MediaQuery.of(context).size.height,
+          // decoration: BoxDecoration(
+          //   image: DecorationImage(image: AssetImage('assets/images/bg.jpg'), fit: BoxFit.fill)
+          // ),
           child: Column(
             children: [
-              TextField(
-                maxLines: null,
-                controller: textEditingController,
-                // decoration: InputDecoration(),
+              Expanded(
+                child: TextField(
+                  maxLines: null,
+                  controller: textEditingController,
+                  maxLength: null,
+                  minLines: null,
+                  cursorColor: Colors.black,
+                  enableInteractiveSelection: true,
+                  smartQuotesType: SmartQuotesType.enabled,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                  ),
+                  style: TextStyle(fontSize: 24, height: 1.9),
+                ),
               ),
             ],
           ),
