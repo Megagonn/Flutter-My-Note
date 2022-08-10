@@ -85,109 +85,108 @@ class _UIState extends State<UI> {
   Widget build(BuildContext context) {
     // var prov = context.select((Prov myprov) => myprov);
     // prov.getData;
-    return SafeArea(
-      child: Scaffold(
-        ///Bottom NavBar
-        bottomNavigationBar:
-            // CurvedNavigationBar(
-            //   items: items,
-            //   height: 50,
-            //   onTap: ((value) {
-            //     setState(() {
-            //       cIndex = value;
-            //       pager(value);
-            //     });
-            //   }),
-            //   color: Theme.of(context).backgroundColor,
-            //   backgroundColor: Colors.white,
-            //   buttonBackgroundColor: const Color(0xffea8c55),
-            // ),
-            BottomAnimation(
-          barHeight: 60,
-          selectedIndex: cIndex,
-          items: items,
-          backgroundColor: Theme.of(context).backgroundColor,
-          onItemSelect: (value) {
-            setState(() {
-              cIndex = value;
-              pager(value);
-            });
-          },
-          itemHoverColor: Theme.of(context).primaryColorLight,
-          itemHoverColorOpacity: .2,
-          activeIconColor: Colors.black,
-          deActiveIconColor: Color.fromARGB(255, 0, 0, 0),
-          barRadius: 30,
-          textStyle: TextStyle(
-            color: Theme.of(context).hintColor,
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
-          itemHoverWidth: 135,
-          itemHoverBorderRadius: 30,
+    return Scaffold(
+      ///Bottom NavBar
+      bottomNavigationBar:
+          // CurvedNavigationBar(
+          //   items: items,
+          //   height: 50,
+          //   onTap: ((value) {
+          //     setState(() {
+          //       cIndex = value;
+          //       pager(value);
+          //     });
+          //   }),
+          //   color: Theme.of(context).backgroundColor,
+          //   backgroundColor: Colors.white,
+          //   buttonBackgroundColor: const Color(0xffea8c55),
+          // ),
+          BottomAnimation(
+        barHeight: 60,
+        selectedIndex: cIndex,
+        items: items,
+        backgroundColor: Theme.of(context).backgroundColor,
+        onItemSelect: (value) {
+          setState(() {
+            cIndex = value;
+            pager(value);
+          });
+        },
+        itemHoverColor: Theme.of(context).primaryColorLight,
+        itemHoverColorOpacity: .2,
+        activeIconColor: Colors.black,
+        deActiveIconColor: Color.fromARGB(255, 0, 0, 0),
+        barRadius: 30,
+        textStyle: TextStyle(
+          color: Theme.of(context).hintColor,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
         ),
+        itemHoverWidth: 135,
+        itemHoverBorderRadius: 30,
+      ),
 
-        ///AppBar
-        appBar: AppBar(
-          title: const Text("Note Pad"),
-          backgroundColor: Theme.of(context).backgroundColor,
+      ///AppBar
+      appBar: AppBar(
+        title: const Text("Note Pad"),
+        backgroundColor: Theme.of(context).backgroundColor,
 
-          ///actions
-          actions: [
-            isSearching
-                ? Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: SizedBox(
-                      height: 30,
-                      width: 140,
-                      child: TextField(
-                        controller: textEditingController,
-                        onChanged: (value) {
-                          setState(() {
-                            Prov().changeData();
-                          });
-                        },
-                        autofocus: true,
-                        cursorColor: Colors.black,
-                        decoration: InputDecoration(
-                            filled: true,
-                            border: UnderlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(50)),
-                            hintText: 'Search'),
-                      ),
+        ///actions
+        actions: [
+          isSearching
+              ? Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: SizedBox(
+                    height: 30,
+                    width: 140,
+                    child: TextField(
+                      controller: textEditingController,
+                      onChanged: (value) {
+                        setState(() {
+                          Prov().changeData();
+                        });
+                      },
+                      autofocus: true,
+                      cursorColor: Colors.black,
+                      decoration: InputDecoration(
+                          filled: true,
+                          border: UnderlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(50)),
+                          hintText: 'Search'),
                     ),
-                  )
-                : SizedBox.shrink(),
-            IconButton(
-                onPressed: () {
-                  setState(() {
-                    isSearching = !isSearching;
-                    isSearching ? pageController.jumpToPage(0) : null;
-                    isSearching ? cIndex = 0 : null;
-                    textEditingController.clear();
-                  });
-                },
-                icon: Icon(isSearching ? Icons.close : CupertinoIcons.search))
-          ],
-        ),
+                  ),
+                )
+              : SizedBox.shrink(),
+          IconButton(
+              onPressed: () {
+                setState(() {
+                  isSearching = !isSearching;
+                  isSearching ? pageController.jumpToPage(0) : null;
+                  isSearching ? cIndex = 0 : null;
+                  textEditingController.clear();
+                });
+              },
+              icon: Icon(isSearching ? Icons.close : CupertinoIcons.search))
+        ],
+      ),
 
-        ///Body
-        body: SafeArea(
-          child: PageView(
-            controller: pageController,
-            // onPageChanged: (val) {
-            //   setState(() {
-            //     currentIndex = val;
-            //     pageController.jumpToPage(val);
-            //   });
-            // },
-            children: [
-              Home(),
-              MyInput(),
-              // Category(),
-            ],
-          ),
+      ///Body
+      body: SafeArea(
+        child: PageView(
+          scrollDirection: Axis.vertical,
+          controller: pageController,
+          // onPageChanged: (val) {
+          //   setState(() {
+          //     currentIndex = val;
+          //     pageController.jumpToPage(val);
+          //   });
+          // },
+          children: [
+            Home(),
+            MyInput(),
+            // Category(),
+          ],
         ),
       ),
     );
