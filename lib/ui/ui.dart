@@ -259,6 +259,9 @@ class _MyInputState extends State<MyInput> {
               Expanded(
                 child: TextField(
                   controller: textEditingController,
+                  cursorColor: Colors.black,
+                  textCapitalization: TextCapitalization.sentences,
+                  textInputAction: TextInputAction.newline,
                   decoration: InputDecoration(
                       hintText: "Add note...",
                       hintStyle: TextStyle(color: Colors.grey),

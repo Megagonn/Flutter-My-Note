@@ -304,6 +304,8 @@ class _EditState extends State<Edit> {
                 child: TextField(
                   maxLines: null,
                   controller: textEditingController,
+                  textCapitalization: TextCapitalization.sentences,
+                  textInputAction: TextInputAction.newline,
                   maxLength: null,
                   minLines: null,
                   cursorColor: Colors.black,
